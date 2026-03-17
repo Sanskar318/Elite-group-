@@ -3,67 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE SPORTS | Home</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <title>Tushar Stream | Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #0ea5e9; --bg: #02040a; --card: #0f172a; }
-        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .cat-card { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
-        .cat-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 30px -10px var(--accent); }
+        body { background: #0b0f14; font-family: 'Poppins', sans-serif; color: white; }
+        .ch-card { background: #161b22; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; cursor: pointer; }
+        .ch-card:hover { border-color: #00ffcc; transform: translateY(-3px); box-shadow: 0 10px 20px -10px #00ffcc33; }
     </style>
 </head>
-<body class="pb-10">
-
-    <nav class="glass sticky top-0 z-50 p-4 flex justify-between items-center">
-        <div class="text-2xl font-black tracking-tighter text-white">ELITE<span class="text-sky-500">SPORTS</span></div>
-        <div class="text-[10px] font-bold bg-sky-500/20 text-sky-400 px-2 py-1 rounded">V17 PRO</div>
-    </nav>
-
-    <div class="px-5 mt-8">
-        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-            <span class="w-1 h-6 bg-sky-500 rounded-full"></span> Signal Sources
-        </h2>
-        <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar" id="catContainer">
-            </div>
+<body class="p-4">
+    <div class="max-w-4xl mx-auto flex justify-between items-center mb-8 p-5 bg-slate-900/80 rounded-3xl border border-white/5">
+        <h1 class="text-xl font-bold tracking-tighter">TUSHAR <span class="text-sky-400">STREAM</span></h1>
+        <div class="flex items-center gap-2 bg-red-600/20 text-red-500 px-3 py-1 rounded-full text-[10px] font-black animate-pulse border border-red-500/30">
+            <span class="w-2 h-2 bg-red-500 rounded-full"></span> LIVE
+        </div>
     </div>
 
-    <div class="px-5 mt-6">
-        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-            <span class="w-1 h-6 bg-red-500 rounded-full"></span> Top Signals
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="featuredGrid">
-            </div>
+    <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="channelGrid">
+        <div class="col-span-full text-center py-20 text-slate-500 text-sm animate-pulse">Syncing Pipelines...</div>
     </div>
 
     <script>
-        const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
-        const manuals = JSON.parse(localStorage.getItem('elite_data')) || [];
+        const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json';
+        const SONY_M3U = 'https://raw.githubusercontent.com/doctor-8trange/zyphora/refs/heads/main/data/sony.m3u';
+        // Proxy to bypass CORS for Sony M3U
+        const PROXY = 'https://corsproxy.io/?';
 
-        function renderIndex() {
-            const catBox = document.getElementById('catContainer');
-            for(let key in sources) {
-                catBox.innerHTML += `
-                <div class="cat-card min-w-[140px] h-32 bg-slate-900 rounded-3xl relative overflow-hidden cursor-pointer" onclick="location.href='category.html?source=${key}'">
-                    <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=300" class="absolute inset-0 w-full h-full object-cover opacity-30">
-                    <div class="absolute bottom-4 w-full text-center font-black text-sm uppercase tracking-wider">${key}</div>
-                </div>`;
+        async function loadAllChannels() {
+            const grid = document.getElementById('channelGrid');
+            try {
+                // 1. Fetch JSON (Colors HD etc.)
+                const jRes = await fetch(JSON_URL);
+                const jsonData = await jRes.json();
+                
+                // 2. Fetch Sony M3U
+                const mRes = await fetch(PROXY + encodeURIComponent(SONY_M3U));
+                const mText = await mRes.text();
+                const m3uData = parseM3U(mText);
+
+                grid.innerHTML = ''; // Clear loader
+                renderChannels([...jsonData, ...m3uData]);
+
+            } catch (err) {
+                grid.innerHTML = "<p class='col-span-full text-center text-red-400'>Error loading streams. Check connection.</p>";
             }
-
-            const featBox = document.getElementById('featuredGrid');
-            manuals.forEach(m => {
-                featBox.innerHTML += `
-                <div class="bg-slate-900 rounded-[2rem] overflow-hidden border border-white/5 cursor-pointer" onclick="location.href='player.html?url=${encodeURIComponent(m.url1)}&title=${encodeURIComponent(m.title)}'">
-                    <img src="${m.thumb}" class="w-full aspect-video object-cover">
-                    <div class="p-5">
-                        <div class="text-[10px] font-bold text-sky-500 uppercase tracking-widest mb-1">Live Signal</div>
-                        <div class="font-bold text-lg text-white truncate">${m.title}</div>
-                    </div>
-                </div>`;
-            });
         }
-        window.onload = renderIndex;
-    </script>
-</body>
-</html>
+
+        function parseM3U(data) {
+            const lines = data.split('\n');
+            let list = [];
+            let temp = {};
+            lines.forEach(line => {
+                if (line.startsWith('#EXTINF:')) {
+                    const logo = line.match(/tvg-logo="([^"]+)"/);
+                    temp.logo = logo ? logo[1] : '';
+                    temp.name = line.split(',')[1]?.trim() || "Channel";
+                } else if (line.startsWith('http')) {
+                    temp.link = line.trim();
+                    list.push({...temp});
+                    temp = {};
+                }
+            });
+            return list;
+        }
+
+        function renderChannels(all) {
+            const grid = document.getElementById('channelGrid');
+            all.forEach(ch => {
+                grid.innerHTML += `
+                <div class="ch-card rounded-2xl overflow-hidden p-3" onclick="openPlayer('${encodeURIComponent(ch.link || ch.iframeSrc)}', '${encodeURIComponent(ch.name)}')">
+                    <img src="${ch.logo}" class="w-full aspect-square object-contain bg-black rounded-xl mb-3 p-2">
+                    <div class="text-[11px] font-bold text-center truncate uppercase tracking-tight">${ch.name}
+        
