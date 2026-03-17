@@ -3,111 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ELITE STREAM | 4K Wide Console</title>
+    <title>ELITE SPORTS | Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        :root { --accent: #ff0055; --bg: #000; --card: #080808; --border: rgba(255, 255, 255, 0.1); }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --accent: #ff0055; --bg: #050505; --card: #121212; --border: rgba(255,255,255,0.08); }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
 
-        /* Navbar */
-        .nav-container { position: sticky; top: 0; width: 100%; padding: 18px 25px; background: rgba(0,0,0,0.85); backdrop-filter: blur(25px); display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-bottom: 1px solid var(--border); }
-        .logo { font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; }
-        .logo span { color: var(--accent); text-shadow: 0 0 15px var(--accent); }
-        .ticker-bar { background: var(--accent); color: white; padding: 6px; font-size: 0.7rem; font-weight: 900; text-align: center; letter-spacing: 1px; }
+        /* Premium Navbar */
+        .navbar { position: sticky; top: 0; width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-bottom: 1px solid var(--border); }
+        .logo { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 900; color: var(--accent); text-transform: uppercase; }
 
-        /* 4K WIDE BENTO GRID */
-        .bento-grid { padding: 20px; display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
-        
-        @media (min-width: 768px) {
-            /* 3 Columns for more breadth (width) per card */
-            .bento-grid { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 260px; }
-            .hero { grid-column: span 2; grid-row: span 2; }
-        }
+        /* Featured Banner (4K Look) */
+        .hero-banner { width: 100%; height: 50vh; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 40px; }
+        .banner-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) contrast(1.1); }
+        .banner-content { position: relative; z-index: 2; max-width: 600px; }
+        .banner-tag { background: var(--accent); padding: 4px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 900; }
+        .banner-title { font-family: 'Space Grotesk'; font-size: 2.5rem; margin: 10px 0; }
 
-        /* 4K PREMIUM CARDS */
-        .card-unit {
-            background: var(--card); border: 1px solid var(--border); border-radius: 35px;
-            position: relative; overflow: hidden; display: flex; flex-direction: column;
-            justify-content: flex-end; transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1); cursor: pointer;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9); min-height: 230px;
-        }
+        /* Section Styling */
+        .section-container { padding: 30px 20px; }
+        .section-title { font-family: 'Space Grotesk'; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 10px; }
 
-        .card-bg { 
-            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; 
-            opacity: 0.6; transition: 0.8s ease;
-            /* HD PROCESSING FILTERS */
-            filter: contrast(1.2) saturate(1.3) brightness(0.85) sepia(0.05);
-        }
+        /* Category Scroll Grid */
+        .category-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .category-scroll::-webkit-scrollbar { display: none; }
 
-        .card-unit:hover .card-bg { opacity: 0.9; transform: scale(1.04); filter: contrast(1.3) saturate(1.5) brightness(1); }
-        .card-unit:hover { border-color: var(--accent); transform: translateY(-8px); }
+        /* Category Card (Square/Wide) */
+        .cat-card { min-width: 160px; height: 160px; background: var(--card); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; cursor: pointer; transition: 0.4s; flex-shrink: 0; }
+        .cat-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; filter: saturate(1.2); }
+        .cat-card:hover { border-color: var(--accent); transform: scale(1.05); }
+        .cat-name { position: absolute; bottom: 15px; width: 100%; text-align: center; font-weight: 800; font-size: 0.9rem; text-shadow: 0 2px 10px #000; }
 
-        .card-content { position: relative; z-index: 2; padding: 25px; background: linear-gradient(0deg, rgba(0,0,0,1) 20%, transparent 100%); }
-        .badge { position: absolute; top: 20px; left: 20px; background: var(--accent); padding: 6px 15px; border-radius: 14px; font-size: 0.65rem; font-weight: 900; z-index: 3; }
-        .hdr-tag { position: absolute; top: 22px; right: 25px; font-size: 0.6rem; font-weight: 900; color: #00d2ff; text-shadow: 0 0 5px #00d2ff; }
-        .title { font-family: 'Space Grotesk'; font-size: 1.4rem; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,1); line-height: 1.1; }
+        /* Live Event Grid (Wide Cards) */
+        .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .event-card { background: var(--card); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: 0.4s; }
+        .event-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; filter: contrast(1.1) saturate(1.2); }
+        .event-info { padding: 15px; }
+        .event-title { font-size: 1rem; font-weight: 700; margin-bottom: 5px; }
+        .event-meta { font-size: 0.65rem; color: #888; text-transform: uppercase; }
 
-        /* Shimmer */
-        .shimmer { background: #0a0a0a; position: relative; overflow: hidden; }
-        .shimmer::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); animation: shim 1.5s infinite; }
-        @keyframes shim { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     </style>
 </head>
 <body>
-    <div id="maint-screen" style="position:fixed; inset:0; background:#000; z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center;">
-        <h1 style="color:var(--accent); font-family:'Space Grotesk';">UNDER MAINTENANCE</h1>
-    </div>
-    <div class="ticker-bar" id="ticker">INITIALIZING 4K HDR BROADCAST...</div>
-    <nav class="nav-container">
-        <div class="logo">ELITE<span>STREAM</span></div>
-        <div style="font-size:0.6rem; color:#555; font-weight:900;">4K V15.0 PRO</div>
+
+    <nav class="navbar">
+        <div class="logo">ELITE<span>SPORTS</span></div>
     </nav>
-    <main class="bento-grid" id="mainGrid">
-        <div class="card-unit hero shimmer"></div>
-        <div class="card-unit shimmer"></div>
-        <div class="card-unit shimmer"></div>
-    </main>
+
+    <div class="hero-banner">
+        <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" class="banner-img">
+        <div class="banner-content">
+            <span class="banner-tag">FEATURED NOW</span>
+            <h1 class="banner-title">IPL 2024: LIVE BROADCAST</h1>
+            <p style="color: #ccc; font-size: 0.9rem;">Watch high-definition sports streams from multiple sources in one place.</p>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <h2 class="section-title">Streaming Sources</h2>
+        <div class="category-scroll" id="categoryHub">
+            <div class="cat-card" onclick="openCategory('FANCODE')">
+                <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=500">
+                <div class="cat-name">FANCODE</div>
+            </div>
+            <div class="cat-card" onclick="openCategory('SONYLIV')">
+                <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?q=80&w=500">
+                <div class="cat-name">SONYLIV</div>
+            </div>
+            <div class="cat-card" onclick="openCategory('IPTV')">
+                <img src="https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?q=80&w=500">
+                <div class="cat-name">LIVE TV (M3U)</div>
+            </div>
+            <div class="cat-card" onclick="openCategory('MOVIES')">
+                <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=500">
+                <div class="cat-name">MOVIES</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <h2 class="section-title">Manual Picks</h2>
+        <div class="live-grid" id="manualGrid">
+            </div>
+    </div>
+
     <script>
-        const config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "System Live" };
         const manualData = JSON.parse(localStorage.getItem('elite_data')) || [];
-        const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
 
-        async function init() {
-            if(!config.master) { document.getElementById('maint-screen').style.display = 'flex'; return; }
-            document.getElementById('ticker').innerText = config.alert;
-
-            let allData = [...manualData];
-            for (let cat in sources) {
-                try {
-                    const res = await fetch(sources[cat]);
-                    const json = await res.json();
-                    allData = [...allData, ...json.map(item => ({ ...item, category: cat }))];
-                } catch (e) { console.error("Source Error", cat); }
-            }
-            render(allData);
+        function openCategory(name) {
+            // Category page par bhejega with source name
+            window.location.href = `category.html?source=${name}`;
         }
 
-        function render(data) {
-            const grid = document.getElementById('mainGrid');
-            grid.innerHTML = "";
-            data.forEach((s, i) => {
-                let cls = "card-unit";
-                if(i === 0) cls += " hero";
+        function renderManual() {
+            const grid = document.getElementById('manualGrid');
+            if(manualData.length === 0) {
+                grid.innerHTML = "<p style='color:#444'>No manual picks available.</p>";
+                return;
+            }
+            manualData.forEach(item => {
                 grid.innerHTML += `
-                    <div class="${cls}" onclick="location.href='player.html?url=${encodeURIComponent(s.url1 || s.url)}&title=${encodeURIComponent(s.title)}'">
-                        <img src="${s.thumb}" class="card-bg">
-                        <div class="badge">${s.category || 'LIVE'}</div>
-                        <div class="hdr-tag">4K ULTRA HD</div>
-                        <div class="card-content">
-                            <h2 class="title">${s.title}</h2>
+                    <div class="event-card" onclick="location.href='player.html?url=${encodeURIComponent(item.url1)}&title=${encodeURIComponent(item.title)}'">
+                        <img src="${item.thumb}" class="event-thumb">
+                        <div class="event-info">
+                            <div class="event-meta">EXCLUSIVE • 4K</div>
+                            <div class="event-title">${item.title}</div>
                         </div>
                     </div>`;
             });
-            gsap.from(".card-unit", { opacity: 0, y: 30, stagger: 0.1, duration: 1, ease: "power4.out" });
         }
-        window.onload = init;
+
+        window.onload = renderManual;
     </script>
 </body>
 </html>
