@@ -3,131 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | FanCode Live</title>
+    <title>ELITE | FanCode Signals</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        :root { --accent: #00acee; --bg: #030a13; --card-bg: #101a26; --border: #1e2d3e; }
+        :root { --accent: #00acee; --bg: #030a13; --card: #101a26; --border: #1e2d3e; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { background: var(--bg); color: white; padding: 15px; }
-
         .container { max-width: 500px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        /* --- FanCode Card Design --- */
         .match-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            background: var(--card); border-radius: 16px; margin-bottom: 20px;
+            overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        .poster-area {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/9;
-        }
-        .poster-area img { width: 100%; height: 100%; object-fit: cover; }
+        .poster { position: relative; width: 100%; aspect-ratio: 16/9; }
+        .poster img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1); }
         
-        .status-badge {
-            position: absolute; bottom: 10px; right: 10px;
-            padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 900;
-        }
-        .live { background: #ff0000; color: white; }
-        .upcoming { background: #555; color: white; }
+        .badge { position: absolute; bottom: 12px; right: 12px; padding: 5px 12px; border-radius: 8px; font-size: 0.65rem; font-weight: 900; }
+        .live { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .up { background: #444; }
 
-        .event-tag {
-            position: absolute; top: 10px; left: 10px;
-            background: rgba(0,0,0,0.7); padding: 4px 8px;
-            border-radius: 6px; font-size: 0.6rem; color: #00acee;
-        }
-
-        /* Match Info Section */
-        .match-info { padding: 15px; text-align: center; }
+        .info { padding: 18px; text-align: center; }
+        .event-name { font-size: 0.65rem; color: #8899a6; text-transform: uppercase; margin-bottom: 12px; }
+        .teams { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .team-name { flex: 1; font-weight: 700; font-size: 0.9rem; color: #fff; }
+        .vs { width: 35px; height: 35px; background: #1e2d3e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent); font-weight: 900; }
         
-        .event-name { font-size: 0.7rem; color: #8899a6; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .teams-row {
-            display: flex; justify-content: space-between; align-items: center;
-            margin: 10px 0; padding: 0 10px;
+        .time { font-size: 0.75rem; color: var(--accent); margin-bottom: 18px; font-weight: 600; }
+        .btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; background: var(--accent); color: white; text-decoration: none;
+            padding: 14px; border-radius: 50px; font-weight: 900; font-size: 0.9rem; transition: 0.3s;
         }
-        .team-box { flex: 1; text-align: center; }
-        .team-box span { display: block; font-weight: 700; font-size: 0.85rem; margin-top: 5px; }
-        
-        .vs-circle { 
-            width: 30px; height: 30px; background: #1e2d3e; 
-            border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; font-size: 0.7rem; font-weight: 900; color: var(--accent);
-        }
-
-        .match-time { font-size: 0.7rem; color: #00acee; margin-bottom: 15px; font-weight: 600; }
-
-        /* Watch Button */
-        .watch-btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; background: var(--accent); color: white;
-            text-decoration: none; padding: 12px; border-radius: 50px;
-            font-weight: 900; font-size: 0.9rem; transition: 0.3s;
-        }
-        .watch-btn:hover { background: #008fcc; transform: scale(0.97); }
-        
-        .loader { text-align: center; margin-top: 50px; color: #555; font-weight: 900; }
+        .btn:hover { transform: scale(0.96); filter: brightness(1.1); }
+        .btn.disabled { background: #222; color: #555; pointer-events: none; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div id="loader" class="loader">FETCHING FANCODE SIGNALS...</div>
-        <div id="grid"></div>
+<div class="container">
+    <div class="header">
+        <h2 style="font-weight:900;">Live & Upcoming</h2>
+        <a href="index.html" style="color:var(--accent); text-decoration:none; font-size:0.8rem;">HOME</a>
     </div>
+    <div id="grid"></div>
+</div>
 
-    <script>
-        const url = "https://raw.githubusercontent.com/drmlive/fancode-live-events/refs/heads/main/fancode.json";
+<script>
+    const jsonUrl = "https://raw.githubusercontent.com/drmlive/fancode-live-events/refs/heads/main/fancode.json";
 
-        async function fetchMatches() {
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                const grid = document.getElementById('grid');
-                document.getElementById('loader').style.display = 'none';
+    async function loadMatches() {
+        const grid = document.getElementById('grid');
+        try {
+            const res = await fetch(jsonUrl);
+            const data = await res.json();
+            grid.innerHTML = "";
 
-                // NOTE: Using data.matches because your JSON has a "matches" key
-                data.matches.forEach(match => {
-                    const isLive = match.status === "LIVE";
-                    
-                    grid.innerHTML += `
-                        <div class="match-card">
-                            <div class="poster-area">
-                                <img src="${match.src}" alt="Poster">
-                                <div class="event-tag">${match.event_category}</div>
-                                <div class="status-badge ${isLive ? 'live' : 'upcoming'}">${match.status}</div>
-                            </div>
-                            <div class="match-info">
-                                <div class="event-name">${match.event_name}</div>
-                                <div class="teams-row">
-                                    <div class="team-box">
-                                        <span style="color:#fff">${match.team_1}</span>
-                                    </div>
-                                    <div class="vs-circle">VS</div>
-                                    <div class="team-box">
-                                        <span style="color:#fff">${match.team_2}</span>
-                                    </div>
-                                </div>
-                                <div class="match-time">🕒 ${match.startTime}</div>
-                                <a href="player.html?id=${match.match_id}" class="watch-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                                    WATCH LIVE
-                                </a>
-                            </div>
+            data.matches.forEach(m => {
+                const stream = m.adfree_url || m.dai_url;
+                const isLive = m.status === "LIVE";
+                
+                grid.innerHTML += `
+                    <div class="match-card">
+                        <div class="poster">
+                            <img src="${m.src}">
+                            <div class="badge ${isLive?'live':'up'}">${m.status}</div>
                         </div>
-                    `;
-                });
-            } catch (e) {
-                document.getElementById('loader').innerText = "FAILED TO LOAD DATA";
-            }
-        }
-
-        window.onload = fetchMatches;
-    </script>
+                        <div class="info">
+                            <div class="event-name">${m.event_name}</div>
+                            <div class="teams">
+                                <div class="team-name">${m.team_1}</div>
+                                <div class="vs">VS</div>
+                                <div class="team-name">${m.team_2}</div>
+                            </div>
+                            <div class="time">🕒 ${m.startTime}</div>
+                            <a href="player.html?url=${encodeURIComponent(stream)}&title=${encodeURIComponent(m.match_name)}&thumb=${encodeURIComponent(m.src)}" 
+                               class="btn ${!stream ? 'disabled' : ''}">
+                                ${stream ? 'WATCH LIVE' : 'SIGNAL OFFLINE'}
+                            </a>
+                        </div>
+                    </div>`;
+            });
+            gsap.from(".match-card", {opacity: 0, y: 30, stagger: 0.1});
+        } catch (e) { grid.innerHTML = "Error Loading Pipeline..."; }
+    }
+    window.onload = loadMatches;
+</script>
 </body>
 </html>
