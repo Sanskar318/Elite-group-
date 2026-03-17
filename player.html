@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE SONY PLAYER</title>
+    <title>ELITE | Sony Engine</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/dplayer@latest/dist/DPlayer.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        body { background: #000; height: 100vh; overflow: hidden; }
         #dplayer { width: 100%; height: 100vh; }
     </style>
 </head>
 <body>
+
     <div id="dplayer"></div>
 
     <script>
@@ -21,21 +23,20 @@
         if (rawUrl) {
             const decodedUrl = decodeURIComponent(rawUrl);
             
-            // Step 1: Link aur Headers ko pipeline (|) se alag karna
+            // Link aur Headers ko split karna (|)
             const parts = decodedUrl.split('|');
             const streamUrl = parts[0];
-            const headerString = parts[1] || "";
+            const headerStr = parts[1] || "";
 
-            // Step 2: Saare headers (& se jude hue) ko map mein convert karna
-            const headerMap = {};
-            if (headerString) {
-                headerString.split('&').forEach(pair => {
+            // Saare headers ko extract karke object mein dalna
+            const headers = {};
+            if (headerStr) {
+                headerStr.split('&').forEach(pair => {
                     const [key, value] = pair.split('=');
-                    if (key && value) headerMap[key] = value;
+                    if (key && value) headers[key] = value;
                 });
             }
 
-            // Step 3: DPlayer Initialize karna
             const dp = new DPlayer({
                 container: document.getElementById('dplayer'),
                 autoplay: true,
@@ -47,11 +48,11 @@
                         customHls: function (video) {
                             const hls = new Hls({
                                 xhrSetup: function (xhr) {
-                                    // SonyLiv specific headers inject karna
-                                    if (headerMap['User-Agent']) xhr.setRequestHeader('User-Agent', headerMap['User-Agent']);
-                                    if (headerMap['Referer']) xhr.setRequestHeader('Referer', headerMap['Referer']);
-                                    if (headerMap['Origin']) xhr.setRequestHeader('Origin', headerMap['Origin']);
-                                    if (headerMap['x-playback-session-id']) xhr.setRequestHeader('x-playback-session-id', headerMap['x-playback-session-id']);
+                                    // SonyLiv specific security headers
+                                    if (headers['User-Agent']) xhr.setRequestHeader('User-Agent', headers['User-Agent']);
+                                    if (headers['Referer']) xhr.setRequestHeader('Referer', headers['Referer']);
+                                    if (headers['Origin']) xhr.setRequestHeader('Origin', headers['Origin']);
+                                    if (headers['x-playback-session-id']) xhr.setRequestHeader('x-playback-session-id', headers['x-playback-session-id']);
                                 }
                             });
                             hls.loadSource(video.src);
@@ -60,8 +61,6 @@
                     }
                 }
             });
-        } else {
-            document.body.innerHTML = "<h2 style='color:white; text-align:center; padding-top:20%; font-family:sans-serif;'>URL Pipeline Missing!</h2>";
         }
     </script>
 </body>
