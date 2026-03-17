@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE | 4K HDR Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root { --accent: #ff0055; --bg: #000; --border: rgba(255,255,255,0.1); }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; margin: 0; padding: 0; overflow: hidden; }
+        
+        .player-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #000; }
+        
+        /* Tactical Video Frame */
+        #video-wrapper { position: relative; width: 100%; flex-grow: 1; background: #000; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; max-height: 100vh; outline: none; box-shadow: 0 0 50px rgba(255, 0, 85, 0.1); }
+
+        /* Floating Back Button */
+        .back-btn { position: absolute; top: 20px; left: 20px; z-index: 100; background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid var(--border); color: white; text-decoration: none; font-weight: 900; font-size: 0.8rem; }
+
+        /* Status Bar */
+        .bottom-info { position: absolute; bottom: 0; width: 100%; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 10; display: flex; justify-content: space-between; align-items: flex-end; }
+        .title { font-size: 1.2rem; font-weight: 900; text-shadow: 0 2px 10px #000; }
+        .quality-tag { background: var(--accent); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; letter-spacing: 1px; }
+
+        .error-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; display: none; z-index: 20; }
+        .loader { width: 50px; height: 50px; border: 5px solid #111; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="player-container">
+        <a href="index.html" class="back-btn">← EXIT</a>
+
+        <div id="video-wrapper">
+            <div id="loader" class="loader"></div>
+            <div id="error-screen" class="error-msg">
+                <h3 style="color:var(--accent);">SIGNAL LOST</h3>
+                <p style="font-size:0.7rem; color:#555;">Link Expired or Region Blocked</p>
+                <button onclick="location.reload()" style="margin-top:10px; background:#222; color:white; border:none; padding:8px 15px; border-radius:5px;">RETRY</button>
+            </div>
+            
+            <video id="main-player" controls poster="" playsinline crossorigin="anonymous"></video>
+        </div>
+
+        <div class="bottom-info">
+            <div>
+                <div id="displayTitle" class="title">CONNECTING...</div>
+                <div style="font-size:0.6rem; color:#888; font-weight:900;">SIGNAL SOURCE: CLOUD PIPELINE</div>
+            </div>
+            <div class="quality-tag">4K HDR10+</div>
+        </div>
+    </div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const streamUrl = params.get('url');
+    const streamTitle = params.get('title');
+
+    window.onload = () => {
+        if (streamTitle) document.getElementById('displayTitle').innerText = decodeURIComponent(streamTitle);
+        
+        if (streamUrl && streamUrl !== "null" && streamUrl !== "OFFLINE") {
+            const finalUrl = decodeURIComponent(streamUrl);
+            initializePlayer(finalUrl);
+        } else {
+            showError("No Stream URL Provided");
+        }
+    };
+
+    function initializePlayer(url) {
+        const video = document.getElementById('main-player');
+        const loader = document.getElementById('loader');
+
+        if (Hls.isSupported()) {
+            const hls = new Hls({
+                // Sony/Akamai User-Agent Bypass Logic
+                xhrSetup: function (xhr, url) {
+                    xhr.withCredentials = false; // Akamai ke liye aksar false chahiye hota hai
+                    xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Linux; Android 10; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36');
+                },
+                manifestLoadingMaxRetry: 4,
+                levelLoadingMaxRetry: 4
+            });
+
+            hls.loadSource(url);
+            hls.attachTo(video);
+            
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                loader.style.display = 'none';
+                video.play().catch(() => {
+                    console.log("Autoplay blocked, user interaction needed");
+                });
+            });
+
+            hls.on(Hls.Events.ERROR, (event, data) => {
+                if (data.fatal) {
+                    loader.style.display = 'none';
+                    showError();
+                    hls.destroy();
+                }
+            });
+        } 
+        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Safari Fallback
+            video.src = url;
+            video.addEventListener('loadedmetadata', () => {
+                loader.style.display = 'none';
+                video.play();
+            });
+        }
+    }
+
+    function showError(msg) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('error-screen').style.display = 'block';
+        if(msg) document.querySelector('#error-screen p').innerText = msg;
+    }
+</script>
+</body>
+</html>
