@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ELITE PLAYER | Pro Streaming</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --accent: #ff0055;
+            --bg: #000000;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --neon-blue: #00d2ff;
+            --neon-green: #00ff41;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: var(--bg);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Background */
+        .ambient-glow {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80%; height: 60%; background: var(--accent);
+            filter: blur(150px); opacity: 0.1; z-index: -1;
+        }
+
+        /* Top Bar */
+        .player-nav {
+            width: 100%; padding: 15px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            text-decoration: none; color: white; font-size: 0.7rem; font-weight: 800;
+            padding: 8px 16px; background: var(--glass); border-radius: 10px;
+            border: 1px solid var(--border); transition: 0.3s;
+        }
+
+        /* Video Stage */
+        .video-container {
+            width: 95%; max-width: 1100px; aspect-ratio: 16 / 9;
+            background: #000; margin-top: 20px; border-radius: 24px;
+            overflow: hidden; border: 1px solid var(--border);
+            position: relative; box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* Tactical Status Bar */
+        .status-bar {
+            width: 95%; max-width: 1100px; padding: 12px 20px;
+            display: flex; justify-content: space-between;
+            font-size: 0.6rem; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .status-item span { color: var(--neon-blue); }
+
+        /* Server Controls */
+        .controls-panel {
+            margin: 10px 0 40px; width: 95%; max-width: 1100px;
+            padding: 24px; background: var(--glass);
+            border-radius: 24px; backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+        }
+
+        .server-grid { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin-bottom: 20px; }
+        .server-grid::-webkit-scrollbar { display: none; }
+
+        .server-btn {
+            padding: 12px 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            color: #666; border-radius: 12px; cursor: pointer; font-size: 0.7rem;
+            font-weight: 700; transition: 0.3s; white-space: nowrap;
+        }
+
+        .server-btn.active {
+            background: #fff; color: #000; border-color: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        /* Meta Info */
+        .stream-meta {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding-top: 20px; border-top: 1px solid var(--border);
+        }
+
+        .live-badge {
+            background: rgba(255, 0, 85, 0.1); color: var(--accent);
+            padding: 6px 12px; border-radius: 8px; font-size: 0.6rem;
+            font-weight: 900; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .pulse { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-anim 1s infinite; }
+
+        @keyframes pulse-anim { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        .title-area h2 { font-family: 'Space Grotesk'; font-size: 1.3rem; margin-top: 8px; }
+
+        @media (max-width: 768px) {
+            .video-container { border-radius: 12px; width: 100%; margin-top: 0; border: none; }
+            .controls-panel { border-radius: 0; width: 100%; border: none; background: transparent; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow" id="ambient"></div>
+
+    <nav class="player-nav">
+        <a href="index.html" class="back-btn">← EXIT</a>
+        <div style="font-family: 'Space Grotesk'; font-weight: 900; font-size: 1rem;">ELITE<span>STREAM</span></div>
+        <div style="font-size: 0.5rem; color: var(--neon-green); font-weight: 900;">SIGNAL: EXCELLENT</div>
+    </nav>
+
+    <div class="status-bar">
+        <div style="display:flex; gap:15px;">
+            <div class="status-item">PING: <span id="ping">12MS</span></div>
+            <div class="status-item">BITRATE: <span>8.2 MBPS</span></div>
+        </div>
+        <div class="status-item">BUFFER: <span style="color:var(--neon-green)">STABLE</span></div>
+    </div>
+
+    <div class="video-container" id="player-box">
+        <iframe id="main-player" src="" allowfullscreen allow="autoplay"></iframe>
+    </div>
+
+    <div class="controls-panel">
+        <div style="font-size: 0.6rem; color: #444; font-weight: 900; margin-bottom: 15px; letter-spacing: 1px;">SWITCH DATA SERVER</div>
+        
+        <div class="server-grid">
+            <button id="btn1" class="server-btn active" onclick="switchPro(1)">SERVER 01 (HD)</button>
+            <button id="btn2" class="server-btn" onclick="switchPro(2)">SERVER 02 (FAST)</button>
+            <button id="btn3" class="server-btn" onclick="switchPro(3)">SERVER 03 (BACKUP)</button>
+        </div>
+
+        <div class="stream-meta">
+            <div class="title-area">
+                <div class="live-badge"><div class="pulse"></div> LIVE BROADCAST</div>
+                <h2 id="st-title">LOADING STREAM...</h2>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.5rem; color: #444; margin-bottom: 4px;">ENCRYPTION: AES-256</p>
+                <div style="font-size: 0.6rem; color: var(--neon-blue); font-weight: 900;">4K UHD ENABLED</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Retrieval Logic
+        const streams = JSON.parse(localStorage.getItem('elite_data')) || [];
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const currentStream = streams[id];
+
+        function initPlayer() {
+            if(!currentStream) {
+                document.getElementById('st-title').innerText = "STREAM NOT FOUND";
+                return;
+            }
+            
+            document.getElementById('st-title').innerText = currentStream.title;
+            // Load Server 1 by default
+            document.getElementById('main-player').src = currentStream.url1 + "?autoplay=1";
+            
+            // GSAP Intro
+            gsap.from(".video-container", { opacity: 0, scale: 0.9, duration: 1 });
+        }
+
+        function switchPro(serverNum) {
+            const player = document.getElementById('main-player');
+            const box = document.getElementById('player-box');
+            let url = currentStream['url' + serverNum];
+
+            if(!url) { alert("Server " + serverNum + " not available!"); return; }
+
+            gsap.to(box, { opacity: 0, filter: "blur(10px)", duration: 0.3, onComplete: () => {
+                player.src = url + "?autoplay=1";
+                
+                // Update Buttons
+                document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('btn' + serverNum).classList.add('active');
+                
+                gsap.to(box, { opacity: 1, filter: "blur(0px)", duration: 0.5 });
+            }});
+        }
+
+        // Fake Ping Logic
+        setInterval(() => {
+            const ms = Math.floor(Math.random() * (20 - 10) + 10);
+            document.getElementById('ping').innerText = ms + "MS";
+        }, 2000);
+
+        window.onload = initPlayer;
+    </script>
+</body>
+</html>
