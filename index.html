@@ -3,244 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Stream | FanCode Style</title>
+    <title>Elite Stream | Live Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root {
-            --bg: #0b0228;
-            --card: #140836;
-            --header: #07011a;
-            --accent: #ff2e93;
-            --text: #ffffff;
-            --text-muted: rgba(255,255,255,0.7);
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding-bottom: 50px;
-        }
-
-        /* HEADER */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
-            background: var(--header);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .logo { font-family: 'Fjalla One', sans-serif; font-size: 24px; color: var(--accent); font-style: italic; }
-
-        /* SEARCH */
-        .search-box {
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 5px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 200px;
-        }
-
-        .search-box input {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 12px;
-            outline: none;
-            width: 100%;
-        }
-
-        /* CATEGORIES */
-        .categories {
-            display: flex;
-            gap: 10px;
-            padding: 20px;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .categories::-webkit-scrollbar { display: none; }
-
-        .cat-btn {
-            padding: 8px 18px;
-            background: var(--card);
-            border-radius: 25px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.3s;
-        }
-        .cat-btn.active { background: var(--accent); border-color: var(--accent); }
-
-        /* GRID */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            padding: 0 20px;
-        }
-
-        /* CARD */
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-        }
+        :root { --bg: #0b0228; --card: #140836; --header: #07011a; --accent: #ff2e93; --text: #ffffff; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--header); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { font-family: 'Fjalla One', sans-serif; font-size: 22px; color: var(--accent); font-style: italic; }
+        .categories-bar { display: flex; gap: 10px; padding: 15px 20px; overflow-x: auto; scrollbar-width: none; }
+        .categories-bar::-webkit-scrollbar { display: none; }
+        .cat-btn { padding: 8px 20px; background: var(--card); border-radius: 30px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; transition: 0.3s; }
+        .cat-btn.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(255, 46, 147, 0.4); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; padding: 0 20px; }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); position: relative; }
         .card:hover { transform: translateY(-5px); border-color: var(--accent); }
-
-        .card-img-container {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
-            position: relative;
-        }
+        .card-img-container { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
         .card-img { width: 100%; height: 100%; object-fit: contain; }
-
-        .badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: var(--accent);
-            padding: 3px 8px;
-            font-size: 9px;
-            font-weight: 800;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .live-status {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #ff3b3b;
-            padding: 3px 8px;
-            font-size: 9px;
-            font-weight: 800;
-            border-radius: 4px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
+        .badge-cat { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); padding: 3px 8px; font-size: 8px; font-weight: 800; border-radius: 4px; text-transform: uppercase; }
+        .live-label { position: absolute; top: 8px; right: 8px; background: #ff3b3b; padding: 3px 8px; font-size: 8px; font-weight: 900; border-radius: 4px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .card-body { padding: 12px; }
-        .tournament { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-        .match-title { font-family: 'Fjalla One', sans-serif; font-size: 14px; margin-bottom: 8px; letter-spacing: 0.5px; }
-        
-        .watch-btn {
-            background: rgba(255,255,255,0.05);
-            text-align: center;
-            padding: 6px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent);
-            border: 1px solid rgba(255,46,147,0.2);
-        }
-
-        @media (max-width: 600px) {
-            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
-            .search-box { width: 120px; }
-        }
+        .match-title { font-family: 'Fjalla One', sans-serif; font-size: 14px; line-height: 1.2; margin-bottom: 8px; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .btn-watch { background: var(--accent); text-align: center; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; }
+        @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; } }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">TUSHAR STREAM</div>
-    <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass" style="font-size: 12px; opacity: 0.5;"></i>
-        <input type="text" id="searchInput" placeholder="Search Stream...">
+    <div class="logo">ELITE <span style="color:white">STREAM</span></div>
+    <div class="flex gap-4 items-center">
+        <i class="fa-solid fa-magnifying-glass opacity-60"></i>
+        <i class="fa-solid fa-bell opacity-60"></i>
     </div>
 </header>
 
-<div id="categories" class="categories">
-    <div class="cat-btn active" onclick="filterCat('All', this)">ALL</div>
+<div id="categories" class="categories-bar">
+    <div class="cat-btn active" onclick="filterData('All', this)">ALL SPORTS</div>
 </div>
 
 <div id="grid" class="grid">
-    </div>
+    <div class="col-span-full text-center py-20 opacity-40 italic animate-pulse">Establishing Secure Pipeline...</div>
+</div>
 
 <script>
     const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json?v=' + Date.now();
-    let allData = [];
+    const WORKER_URL = 'https://fanco.vodep39240327.workers.dev/';
+    const PROXY = 'https://corsproxy.io/?';
 
-    async function loadStreams() {
+    let allMatches = [];
+
+    async function initDashboard() {
         const grid = document.getElementById('grid');
         try {
-            const res = await fetch(JSON_URL);
-            allData = await res.json();
-            
-            // Build Categories
-            const categoriesDiv = document.getElementById('categories');
-            const cats = ['All', ...new Set(allData.map(ch => ch.category || 'Live TV'))];
-            categoriesDiv.innerHTML = '';
-            cats.forEach(c => {
-                const btn = document.createElement('div');
-                btn.className = `cat-btn ${c === 'All' ? 'active' : ''}`;
-                btn.innerText = c.toUpperCase();
-                btn.onclick = () => filterCat(c, btn);
-                categoriesDiv.appendChild(btn);
-            });
+            // 1. Fetch Manual JSON from GitHub
+            const res1 = await fetch(JSON_URL);
+            const manualData = await res1.json();
 
-            render(allData);
+            // 2. Fetch FanCode Worker Data with Proxy
+            const res2 = await fetch(PROXY + encodeURIComponent(WORKER_URL));
+            const workerJson = await res2.json();
+            
+            // Convert Worker Format to our Format
+            const workerMatches = (workerJson.matches || []).map(m => ({
+                name: m.match_name,
+                logo: m.src,
+                category: m.event_category || 'Cricket',
+                link: m.adfree_url || m.dai_url,
+                isLive: m.status === 'LIVE'
+            }));
+
+            // 3. Merge Both Data Sources
+            allMatches = [...manualData, ...workerMatches];
+
+            // 4. Build Dynamic Categories
+            buildCategories();
+            
+            // 5. Initial Render
+            render(allMatches);
+
         } catch (e) {
-            grid.innerHTML = "Error loading streams...";
+            grid.innerHTML = `<div class="col-span-full text-center text-red-500 font-bold">Failed to load Pipeline. Check Worker API.</div>`;
+            console.error(e);
         }
     }
 
-    function render(list) {
+    function buildCategories() {
+        const categoriesDiv = document.getElementById('categories');
+        const uniqueCats = ['All', ...new Set(allMatches.map(m => m.category || 'Live TV'))];
+        
+        categoriesDiv.innerHTML = '';
+        uniqueCats.forEach(cat => {
+            const btn = document.createElement('div');
+            btn.className = `cat-btn ${cat === 'All' ? 'active' : ''}`;
+            btn.innerText = cat === 'All' ? 'ALL SPORTS' : cat.toUpperCase();
+            btn.onclick = () => filterData(cat, btn);
+            categoriesDiv.appendChild(btn);
+        });
+    }
+
+    function render(data) {
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
-        list.forEach(ch => {
-            const link = ch.link || ch.iframeSrc;
+        data.forEach(m => {
+            const finalUrl = m.link || m.iframeSrc;
+            if(!finalUrl) return; // Skip if no link
+
             const card = document.createElement('div');
             card.className = 'card';
-            card.onclick = () => location.href = `player.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(ch.name)}`;
+            card.onclick = () => location.href = `player.html?url=${encodeURIComponent(finalUrl)}&title=${encodeURIComponent(m.name)}`;
             
             card.innerHTML = `
                 <div class="card-img-container">
-                    <img src="${ch.logo}" class="card-img" onerror="this.src='https://via.placeholder.com/300x168/000/fff?text=No+Logo'">
-                    <span class="badge">${ch.category || 'LIVE'}</span>
-                    <span class="live-status text-white">LIVE</span>
+                    <img src="${m.logo}" class="card-img" onerror="this.src='https://via.placeholder.com/300x168/000/fff?text=No+Logo'">
+                    <span class="badge-cat">${m.category || 'LIVE'}</span>
+                    <span class="live-label">LIVE</span>
                 </div>
                 <div class="card-body">
-                    <div class="tournament">Tushar Stream Special</div>
-                    <div class="match-title">${ch.name}</div>
-                    <div class="watch-btn">WATCH IN HD</div>
+                    <div class="match-title">${m.name}</div>
+                    <div class="btn-watch"><i class="fa-solid fa-play mr-1"></i> WATCH NOW</div>
                 </div>
             `;
             grid.appendChild(card);
         });
     }
 
-    function filterCat(cat, btn) {
+    function filterData(cat, btn) {
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const filtered = cat === 'All' ? allData : allData.filter(ch => (ch.category || 'Live TV') === cat);
+        const filtered = (cat === 'All') ? allMatches : allMatches.filter(m => (m.category || 'Live TV') === cat);
         render(filtered);
     }
 
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        const val = e.target.value.toLowerCase();
-        const searched = allData.filter(ch => ch.name.toLowerCase().includes(val));
-        render(searched);
-    });
-
-    window.onload = loadStreams;
+    window.onload = initDashboard;
 </script>
 
 </body>
