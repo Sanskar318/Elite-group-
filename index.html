@@ -3,208 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ELITE STREAM | Pro Console</title>
+    <title>ELITE STREAM | Future of Live</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         :root {
-            --accent: #ff0055; 
+            --accent: #ff0055;
             --bg: #000000;
-            --card-inner: #0d0d0d;
-            --border-glow: rgba(255, 255, 255, 0.05);
-            --neon-green: #00ff41;
-            --neon-blue: #00d2ff;
-            --glass: rgba(255, 255, 255, 0.03);
+            --card: #0d0d0d;
+            --border-glow: rgba(255, 0, 85, 0.15);
+            --text-main: #ffffff;
+            --text-dim: #666666;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: white; overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* Ticker */
-        #ticker {
-            background: var(--accent); color: white; padding: 8px; font-size: 0.7rem;
-            font-weight: 900; text-align: center; display: none; letter-spacing: 1px;
-            text-transform: uppercase; position: relative; z-index: 1001;
-        }
-
-        /* Navbar */
-        .nav-container {
-            position: sticky; top: 0; width: 100%; padding: 18px 25px;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 1000; border-bottom: 1px solid var(--border-glow);
-        }
-        .logo { font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 900; letter-spacing: -1px; }
-        .logo span { color: var(--accent); text-shadow: 0 0 15px var(--accent); }
-
-        .menu-btn {
-            background: var(--glass); border: 1px solid var(--border-glow);
-            color: white; padding: 8px 12px; border-radius: 10px; cursor: pointer;
-            font-size: 1.2rem;
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Sidebar System */
-        .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-            z-index: 2000; display: none; opacity: 0;
-        }
-        .side-drawer {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--card-inner); border-left: 1px solid var(--border-glow);
-            z-index: 2001; padding: 30px 25px; display: flex; flex-direction: column;
-            gap: 15px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .side-drawer.open { right: 0; }
-        .drawer-link {
-            text-decoration: none; color: #fff; font-size: 0.9rem; font-weight: 700;
-            padding: 15px; background: var(--glass); border-radius: 15px;
-            border: 1px solid var(--border-glow);
+        /* Maintenance Overlay */
+        #maint-screen {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
         }
 
-        /* Category Bar (Matches Screenshot) */
-        .category-bar { padding: 15px 20px 5px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
-        .category-bar::-webkit-scrollbar { display: none; }
-        .cat-btn {
-            display: flex; align-items: center; gap: 8px; padding: 10px 18px;
-            background: var(--glass); border: 1px solid var(--border-glow);
-            border-radius: 30px; font-size: 0.7rem; font-weight: 700;
-            cursor: pointer; color: #aaa; text-transform: uppercase;
+        /* Top Navigation */
+        .navbar {
+            padding: 20px; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .cat-btn::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #444; }
-        .cat-btn.active { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
-        .cat-btn.active[data-cat="CRICKET"]::before { background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
-        .cat-btn.active[data-cat="F1"]::before { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 
-        /* Score Ticker */
-        .score-outer { width: 100%; padding: 10px 20px; }
-        .score-console { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
-        .score-item {
-            display: flex; align-items: center; gap: 10px; padding: 8px 16px;
-            background: var(--glass); border-radius: 30px; border: 1px solid var(--border-glow);
-            flex-shrink: 0; font-size: 0.7rem; font-weight: 700; color: #aaa;
+        .logo { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+
+        /* Ticker Bar */
+        .ticker-wrap {
+            background: var(--accent); color: white; padding: 8px 0;
+            overflow: hidden; font-size: 0.7rem; font-weight: 900; text-transform: uppercase;
         }
-        .live-dot { width: 6px; height: 6px; background: var(--neon-green); border-radius: 50%; animation: pulse 1.5s infinite; }
+        .ticker { display: inline-block; white-space: nowrap; animation: ticker 20s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* Bento Grid */
-        .bento-grid { padding: 10px 20px 40px; display: grid; grid-template-columns: 1fr; gap: 15px; }
-        @media (min-width: 1024px) {
-            .bento-grid { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 220px; max-width: 1300px; margin: 0 auto; gap: 20px; }
-            .hero-unit { grid-column: span 2; grid-row: span 2; }
-            .wide-unit { grid-column: span 2; }
+        /* Bento Grid Layout */
+        .main-container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
         }
 
         .card-unit {
-            background: var(--card-inner); border: 1px solid var(--border-glow);
-            border-radius: 28px; padding: 25px; position: relative; overflow: hidden;
-            display: flex; flex-direction: column; justify-content: flex-end; min-height: 220px;
+            background: var(--card); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 28px; position: relative; overflow: hidden;
+            transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1); cursor: pointer;
+            aspect-ratio: 16 / 9;
         }
-        .card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; z-index: 0; transition: 0.5s; }
-        .card-unit.active-card { border: 2px solid var(--accent) !important; box-shadow: 0 0 30px rgba(255, 0, 85, 0.3); }
-        .card-unit.active-card .card-bg { opacity: 0.7; transform: scale(1.05); }
-        
-        .card-content { position: relative; z-index: 2; }
-        .badge { position: absolute; top: 20px; left: 25px; background: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 900; }
-        .title { font-family: 'Space Grotesk'; font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; }
-        .btn-action { display: inline-block; padding: 10px 24px; background: white; color: black; border-radius: 12px; text-decoration: none; font-size: 0.75rem; font-weight: 800; }
 
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        .card-unit.portrait { aspect-ratio: 9 / 12; }
+
+        .hero-unit { grid-column: span 2; grid-row: span 2; }
+
+        .card-bg {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; opacity: 0.6; transition: 0.5s;
+        }
+
+        .card-unit:hover .card-bg { transform: scale(1.1); opacity: 0.8; }
+
+        .card-content {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 20px; background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+        }
+
+        .badge {
+            position: absolute; top: 15px; left: 15px;
+            background: var(--accent); color: white; padding: 5px 12px;
+            border-radius: 10px; font-size: 0.6rem; font-weight: 900;
+        }
+
+        .title { font-family: 'Space Grotesk'; font-size: 1.1rem; margin-bottom: 5px; }
+
+        /* Shimmer Loading */
+        .shimmer { background: #111; position: relative; overflow: hidden; }
+        .shimmer::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        @media (max-width: 768px) {
+            .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .hero-unit { grid-column: span 2; grid-row: span 1; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="ticker"></div>
+    <div id="maint-screen">
+        <h1 style="color: var(--accent); font-family: 'Space Grotesk';">UNDER MAINTENANCE</h1>
+        <p style="color: #444; margin-top: 10px;">We are upgrading our servers. Back soon!</p>
+    </div>
 
-    <nav class="nav-container">
+    <div class="ticker-wrap">
+        <div class="ticker" id="ticker-text">CONNECTING TO ELITE SECURE BROADCAST PIPELINE... PLEASE WAIT...</div>
+    </div>
+
+    <nav class="navbar">
         <div class="logo">ELITE<span>STREAM</span></div>
-        <div class="menu-btn" onclick="toggleSidebar()">≡</div>
+        <div style="font-size: 0.6rem; font-weight: 900; color: #444;">V13.5 PRO</div>
     </nav>
 
-    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
-    <div class="side-drawer" id="drawer">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <div class="logo" style="font-size:1rem;">ELITE<span>MENU</span></div>
-            <div onclick="toggleSidebar()" style="cursor:pointer; color:var(--accent);">✕</div>
+    <main class="main-container">
+        <div class="bento-grid" id="mainGrid">
+            <div class="card-unit hero-unit shimmer"></div>
+            <div class="card-unit shimmer"></div>
+            <div class="card-unit shimmer"></div>
+            <div class="card-unit shimmer"></div>
         </div>
-        <a href="index.html" class="drawer-link">Home Console</a>
-        <a href="#" class="drawer-link">Join Telegram</a>
-        <a href="admin/dashboard.html" class="drawer-link" style="color:var(--neon-green)">Admin Dashboard</a>
-    </div>
-
-    <div class="category-bar">
-        <div class="cat-btn active" data-cat="ALL" onclick="filterStreams('ALL', this)">All Feeds</div>
-        <div class="cat-btn" data-cat="CRICKET" onclick="filterStreams('CRICKET', this)">Cricket</div>
-        <div class="cat-btn" data-cat="F1" onclick="filterStreams('F1', this)">F1 Racing</div>
-        <div class="cat-btn" data-cat="MOVIES" onclick="filterStreams('MOVIES', this)">Movies</div>
-    </div>
-
-    <div class="score-outer">
-        <div class="score-console">
-            <div class="score-item"><div class="live-dot"></div><span>F1: LAP 12/78</span></div>
-            <div class="score-item"><div class="live-dot" style="background:orange;"></div><span>IPL: MI vs CSK (LIVE)</span></div>
-            <div class="score-item"><span>UFC 300: 08:00 PM</span></div>
-        </div>
-    </div>
-
-    <main class="bento-grid" id="mainGrid"></main>
+    </main>
 
     <script>
-        const eliteStreams = JSON.parse(localStorage.getItem('elite_data')) || [];
-        const eliteConfig = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "" };
+        // Data Load
+        const config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "Welcome to Elite Stream" };
+        const streams = JSON.parse(localStorage.getItem('elite_data')) || [];
+        const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
 
-        function initApp() {
-            if (!eliteConfig.master) {
-                document.body.innerHTML = `<div style="height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#000;"><h1 style="color:var(--accent);">UNDER MAINTENANCE</h1></div>`;
+        function checkSystem() {
+            // Maintenance Check
+            if(!config.master) {
+                document.getElementById('maint-screen').style.display = 'flex';
                 return;
             }
-            if (eliteConfig.alert) {
-                const t = document.getElementById('ticker'); t.innerText = "NOTICE: " + eliteConfig.alert; t.style.display = "block";
-            }
-            renderGrid(eliteStreams);
+
+            // Ticker Update
+            document.getElementById('ticker-text').innerText = config.alert;
+
+            renderGrid();
         }
 
-        function renderGrid(dataList) {
+        function renderGrid() {
             const grid = document.getElementById('mainGrid');
-            grid.innerHTML = dataList.length ? "" : `<p style="text-align:center; padding:50px; color:#444;">No streams found.</p>`;
-            dataList.forEach((s, i) => {
-                let cls = "card-unit";
-                if (i === 0) cls += " hero-unit active-card";
-                grid.innerHTML += `
-                    <div class="${cls}" onclick="location.href='player.html?id=${i}'">
-                        <img src="${s.thumb}" class="card-bg">
-                        <div class="badge">${s.category}</div>
-                        <div class="card-content">
-                            <h2 class="title">${s.title}</h2>
-                            <a href="player.html?id=${i}" class="btn-action">Watch Now</a>
-                        </div>
-                    </div>`;
-            });
-            gsap.from(".card-unit", { opacity: 0, scale: 0.9, stagger: 0.1, duration: 0.6 });
+            
+            setTimeout(() => {
+                grid.innerHTML = "";
+
+                // 1. Render Manual Streams First
+                streams.forEach((s, i) => {
+                    let isHero = i === 0 ? 'hero-unit' : '';
+                    let isPortrait = s.aspect === 'portrait' ? 'portrait' : '';
+                    
+                    grid.innerHTML += `
+                        <div class="card-unit ${isHero} ${isPortrait}" onclick="location.href='player.html?id=${i}'">
+                            <img src="${s.thumb}" class="card-bg">
+                            <div class="badge">${s.category}</div>
+                            <div class="card-content">
+                                <h2 class="title">${s.title}</h2>
+                                <p style="font-size:0.6rem; color:#888;">TAP TO WATCH SIGNAL</p>
+                            </div>
+                        </div>`;
+                });
+
+                // 2. Render Dynamic Category Cards (Sources)
+                for (let catName in sources) {
+                    grid.innerHTML += `
+                        <div class="card-unit" onclick="location.href='category.html?name=${catName}'">
+                            <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1000" class="card-bg">
+                            <div class="badge">SOURCE API</div>
+                            <div class="card-content">
+                                <h2 class="title" style="color: #00d2ff;">${catName}</h2>
+                                <p style="font-size:0.6rem; color:#888;">DYNAMIC JSON CLOUD</p>
+                            </div>
+                        </div>`;
+                }
+
+                gsap.from(".card-unit", { opacity: 0, scale: 0.9, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)" });
+            }, 1000);
         }
 
-        function filterStreams(cat, btn) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filtered = cat === 'ALL' ? eliteStreams : eliteStreams.filter(s => s.category.toUpperCase() === cat);
-            renderGrid(filtered);
-        }
-
-        function toggleSidebar() {
-            const d = document.getElementById('drawer');
-            const o = document.getElementById('overlay');
-            if (!d.classList.contains('open')) {
-                o.style.display = "block"; gsap.to(o, {opacity:1});
-                d.classList.add('open');
-                gsap.from(".drawer-link", {x:30, opacity:0, stagger:0.1});
-            } else {
-                gsap.to(o, {opacity:0, onComplete:()=>o.style.display="none"});
-                d.classList.remove('open');
-            }
-        }
-
-        window.onload = initApp;
+        window.onload = checkSystem;
     </script>
 </body>
 </html>
