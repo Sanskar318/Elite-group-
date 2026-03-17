@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE ADMIN | Master Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --accent: #ff0055;
+            --bg: #000;
+            --card: #0d0d0d;
+            --border: rgba(255, 255, 255, 0.08);
+            --neon-green: #00ff41;
+            --neon-blue: #00d2ff;
+        }
+
+        * { margin:0; padding:0; box-sizing: border-box; }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; padding: 20px; font-size: 14px; }
+        
+        /* Glassmorphism Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Stats Row */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 20px; position: relative; overflow: hidden; }
+        .stat-card h3 { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card p { font-size: 1.5rem; font-weight: 900; margin-top: 5px; font-family: 'Space Grotesk'; }
+        .stat-card::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--accent); opacity: 0.3; }
+
+        /* Grid Layout */
+        .master-layout { display: grid; grid-template-columns: 1fr 400px; gap: 20px; }
+
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 20px; transition: 0.3s; }
+        .panel:hover { border-color: rgba(255, 255, 255, 0.15); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .panel-title { font-size: 0.8rem; font-weight: 900; color: var(--neon-blue); text-transform: uppercase; }
+
+        /* Inputs */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        input, select, textarea {
+            background: #151515; border: 1px solid var(--border); padding: 12px; border-radius: 10px;
+            color: white; outline: none; width: 100%; transition: 0.3s;
+        }
+        input:focus { border-color: var(--accent); background: #1a1a1a; }
+
+        .btn {
+            background: #fff; color: #000; border: none; padding: 12px; border-radius: 10px;
+            font-weight: 900; cursor: pointer; transition: 0.3s; font-size: 0.75rem;
+        }
+        .btn:hover { transform: scale(0.98); background: var(--accent); color: #fff; }
+
+        /* List Items */
+        .stream-item {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            padding: 12px 18px; border-radius: 12px; display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 8px;
+        }
+        .stream-item:hover { background: rgba(255,255,255,0.05); }
+
+        /* Categories Tags */
+        .cat-tag { font-size: 0.6rem; padding: 3px 8px; border-radius: 5px; font-weight: 900; }
+        .cricket { background: rgba(0, 255, 65, 0.1); color: var(--neon-green); }
+        .racing { background: rgba(255, 0, 85, 0.1); color: var(--accent); }
+
+        @media (max-width: 900px) { .master-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+            <div>
+                <h1 style="font-family: 'Space Grotesk'; font-size: 1.8rem;">ELITE<span>PRO</span> DASHBOARD</h1>
+                <p style="font-size: 0.7rem; color: #444;">Connected to: Local-Database (Firebase Ready)</p>
+            </div>
+            <div style="text-align: right;">
+                <div id="clock" style="font-weight: 900; font-size: 1.2rem;">00:00:00</div>
+                <span style="color: var(--neon-green); font-size: 0.6rem; font-weight: 900;">● SERVER STATUS: OPTIMAL</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><h3>Live Users</h3><p id="userCount">1,284</p></div>
+            <div class="stat-card"><h3>Active Streams</h3><p id="streamCount">0</p></div>
+            <div class="stat-card"><h3>System Load</h3><p>12%</p></div>
+            <div class="stat-card"><h3>Uptime</h3><p>99.9%</p></div>
+        </div>
+
+        <div class="master-layout">
+            <div class="main-controls">
+                <div class="panel">
+                    <div class="panel-header"><div class="panel-title">Deploy Stream Pipeline</div></div>
+                    <div class="form-row">
+                        <input type="text" id="streamTitle" placeholder="Event Name (e.g. F1 Race)">
+                        <select id="streamCat">
+                            <option value="CRICKET">CRICKET</option>
+                            <option value="RACING">F1 RACING</option>
+                            <option value="MOVIES">MOVIES</option>
+                            <option value="LIVETV">LIVE TV</option>
+                        </select>
+                    </div>
+                    <input type="text" id="streamUrl" placeholder="Direct Stream Link (m3u8/mp4)" style="margin-bottom: 10px;">
+                    <input type="text" id="streamThumb" placeholder="Thumbnail URL" style="margin-bottom: 10px;">
+                    <button class="btn" style="width: 100%; background: var(--accent); color: white;" onclick="addStream()">EXECUTE DEPLOYMENT</button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header"><div class="panel-title">Active Data Streams</div></div>
+                    <div id="streamList">
+                        </div>
+                </div>
+            </div>
+
+            <div class="side-controls">
+                <div class="panel">
+                    <div class="panel-header"><div class="panel-title">Master Control</div></div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span style="font-size: 0.75rem; font-weight: 700;">Global Streaming</span>
+                        <input type="checkbox" id="masterSwitch" checked onchange="saveConfig()" style="width: 40px; height: 20px; cursor: pointer;">
+                    </div>
+                    <textarea id="globalAlert" rows="2" placeholder="Main Page Alert Message..." oninput="saveConfig()"></textarea>
+                </div>
+
+                <div class="panel" style="background: #050505;">
+                    <div class="panel-title" style="color: #444; margin-bottom: 15px;">Live System Logs</div>
+                    <div id="logs" style="font-family: monospace; font-size: 0.65rem; color: #444; height: 150px; overflow-y: auto;">
+                        [09:41:02] Firewall Active...<br>
+                        [09:41:03] API Endpoint Synchronized...<br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let streams = JSON.parse(localStorage.getItem('elite_data')) || [];
+        let config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "" };
+
+        function init() {
+            renderAll();
+            updateClock();
+            setInterval(updateClock, 1000);
+            // Simulate live user changes
+            setInterval(() => {
+                const change = Math.floor(Math.random() * 10) - 5;
+                const count = parseInt(document.getElementById('userCount').innerText.replace(',',''));
+                document.getElementById('userCount').innerText = (count + change).toLocaleString();
+            }, 3000);
+        }
+
+        function updateClock() {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }
+
+        function renderAll() {
+            const list = document.getElementById('streamList');
+            list.innerHTML = streams.length ? '' : '<p style="color:#333; font-size:0.7rem;">Waiting for deployment...</p>';
+            
+            streams.forEach((s, i) => {
+                list.innerHTML += `
+                    <div class="stream-item">
+                        <div>
+                            <span class="cat-tag ${s.category.toLowerCase() === 'cricket' ? 'cricket' : 'racing'}">${s.category}</span>
+                            <strong style="margin-left:10px; font-size:0.85rem;">${s.title}</strong>
+                        </div>
+                        <button class="btn" style="padding: 5px 10px; background: rgba(255,0,85,0.1); color: var(--accent); border: 1px solid var(--accent);" onclick="deleteStream(${i})">REMOVE</button>
+                    </div>
+                `;
+            });
+            document.getElementById('streamCount').innerText = streams.length;
+            document.getElementById('masterSwitch').checked = config.master;
+            document.getElementById('globalAlert').value = config.alert;
+        }
+
+        function addStream() {
+            const title = document.getElementById('streamTitle').value;
+            const url = document.getElementById('streamUrl').value;
+            const thumb = document.getElementById('streamThumb').value;
+            const cat = document.getElementById('streamCat').value;
+
+            if(title && url) {
+                streams.push({title, url, thumb, category: cat});
+                localStorage.setItem('elite_data', JSON.stringify(streams));
+                log(`Deployed: ${title}`);
+                renderAll();
+                document.querySelectorAll('input').forEach(i => i.value = '');
+            }
+        }
+
+        function deleteStream(i) {
+            log(`Removed: ${streams[i].title}`);
+            streams.splice(i, 1);
+            localStorage.setItem('elite_data', JSON.stringify(streams));
+            renderAll();
+        }
+
+        function saveConfig() {
+            config.master = document.getElementById('masterSwitch').checked;
+            config.alert = document.getElementById('globalAlert').value;
+            localStorage.setItem('elite_config', JSON.stringify(config));
+            log("System Configuration Updated.");
+        }
+
+        function log(msg) {
+            const box = document.getElementById('logs');
+            box.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
