@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Stream | Live Dashboard</title>
+    <title>FanCode Live Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -13,7 +13,7 @@
         .logo { font-family: 'Fjalla One', sans-serif; font-size: 22px; color: var(--accent); font-style: italic; }
         .categories-bar { display: flex; gap: 10px; padding: 15px 20px; overflow-x: auto; scrollbar-width: none; }
         .categories-bar::-webkit-scrollbar { display: none; }
-        .cat-btn { padding: 8px 20px; background: var(--card); border-radius: 30px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; transition: 0.3s; }
+        .cat-btn { padding: 8px 20px; background: var(--card); border-radius: 30px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; transition: 0.3s; text-transform: uppercase; }
         .cat-btn.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(255, 46, 147, 0.4); }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; padding: 0 20px; }
         .card { background: var(--card); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); position: relative; }
@@ -32,72 +32,57 @@
 <body>
 
 <header>
-    <div class="logo">ELITE <span style="color:white">STREAM</span></div>
-    <div class="flex gap-4 items-center">
-        <i class="fa-solid fa-magnifying-glass opacity-60"></i>
-        <i class="fa-solid fa-bell opacity-60"></i>
-    </div>
+    <div class="logo">FANCODE <span style="color:white">LIVE</span></div>
+    <i class="fa-solid fa-magnifying-glass opacity-60"></i>
 </header>
 
 <div id="categories" class="categories-bar">
-    <div class="cat-btn active" onclick="filterData('All', this)">ALL SPORTS</div>
+    <div class="cat-btn active">Loading Sports...</div>
 </div>
 
 <div id="grid" class="grid">
-    <div class="col-span-full text-center py-20 opacity-40 italic animate-pulse">Establishing Secure Pipeline...</div>
+    <div class="col-span-full text-center py-20 opacity-40 italic animate-pulse">Connecting to FanCode Server...</div>
 </div>
 
 <script>
-    const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json?v=' + Date.now();
     const WORKER_URL = 'https://fanco.vodep39240327.workers.dev/';
-    const PROXY = 'https://corsproxy.io/?';
+    const PROXY = 'https://corsproxy.io/?'; // To fix fetching issues
 
     let allMatches = [];
 
-    async function initDashboard() {
+    async function loadFanCodeData() {
         const grid = document.getElementById('grid');
         try {
-            // 1. Fetch Manual JSON from GitHub
-            const res1 = await fetch(JSON_URL);
-            const manualData = await res1.json();
-
-            // 2. Fetch FanCode Worker Data with Proxy
-            const res2 = await fetch(PROXY + encodeURIComponent(WORKER_URL));
-            const workerJson = await res2.json();
+            // Fetch directly from FanCode Worker
+            const response = await fetch(PROXY + encodeURIComponent(WORKER_URL));
+            const data = await response.json();
             
-            // Convert Worker Format to our Format
-            const workerMatches = (workerJson.matches || []).map(m => ({
+            // Map Worker matches to our layout
+            allMatches = (data.matches || []).map(m => ({
                 name: m.match_name,
                 logo: m.src,
                 category: m.event_category || 'Cricket',
                 link: m.adfree_url || m.dai_url,
-                isLive: m.status === 'LIVE'
+                status: m.status
             }));
 
-            // 3. Merge Both Data Sources
-            allMatches = [...manualData, ...workerMatches];
-
-            // 4. Build Dynamic Categories
             buildCategories();
-            
-            // 5. Initial Render
             render(allMatches);
 
         } catch (e) {
-            grid.innerHTML = `<div class="col-span-full text-center text-red-500 font-bold">Failed to load Pipeline. Check Worker API.</div>`;
-            console.error(e);
+            grid.innerHTML = `<div class="col-span-full text-center text-red-500">Error connecting to API.</div>`;
         }
     }
 
     function buildCategories() {
         const categoriesDiv = document.getElementById('categories');
-        const uniqueCats = ['All', ...new Set(allMatches.map(m => m.category || 'Live TV'))];
+        const uniqueCats = ['All', ...new Set(allMatches.map(m => m.category))];
         
         categoriesDiv.innerHTML = '';
         uniqueCats.forEach(cat => {
             const btn = document.createElement('div');
             btn.className = `cat-btn ${cat === 'All' ? 'active' : ''}`;
-            btn.innerText = cat === 'All' ? 'ALL SPORTS' : cat.toUpperCase();
+            btn.innerText = cat === 'All' ? 'ALL SPORTS' : cat;
             btn.onclick = () => filterData(cat, btn);
             categoriesDiv.appendChild(btn);
         });
@@ -106,23 +91,27 @@
     function render(data) {
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
-        data.forEach(m => {
-            const finalUrl = m.link || m.iframeSrc;
-            if(!finalUrl) return; // Skip if no link
+        
+        if(data.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-10 opacity-50">No Live Matches Found.</div>`;
+            return;
+        }
 
+        data.forEach(m => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.onclick = () => location.href = `player.html?url=${encodeURIComponent(finalUrl)}&title=${encodeURIComponent(m.name)}`;
+            // Send to player.html with the stream link
+            card.onclick = () => location.href = `player.html?url=${encodeURIComponent(m.link)}&title=${encodeURIComponent(m.name)}`;
             
             card.innerHTML = `
                 <div class="card-img-container">
-                    <img src="${m.logo}" class="card-img" onerror="this.src='https://via.placeholder.com/300x168/000/fff?text=No+Logo'">
-                    <span class="badge-cat">${m.category || 'LIVE'}</span>
-                    <span class="live-label">LIVE</span>
+                    <img src="${m.logo}" class="card-img" onerror="this.src='https://via.placeholder.com/300x168/000/fff?text=FanCode'">
+                    <span class="badge-cat">${m.category}</span>
+                    <span class="live-label">${m.status || 'LIVE'}</span>
                 </div>
                 <div class="card-body">
                     <div class="match-title">${m.name}</div>
-                    <div class="btn-watch"><i class="fa-solid fa-play mr-1"></i> WATCH NOW</div>
+                    <div class="btn-watch">WATCH NOW</div>
                 </div>
             `;
             grid.appendChild(card);
@@ -132,11 +121,11 @@
     function filterData(cat, btn) {
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const filtered = (cat === 'All') ? allMatches : allMatches.filter(m => (m.category || 'Live TV') === cat);
+        const filtered = (cat === 'All') ? allMatches : allMatches.filter(m => m.category === cat);
         render(filtered);
     }
 
-    window.onload = initDashboard;
+    window.onload = loadFanCodeData;
 </script>
 
 </body>
