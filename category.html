@@ -3,62 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | Sony Pipeline</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Elite Stream | FanCode Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { background: #02040a; color: white; font-family: 'Outfit', sans-serif; }
-        .sony-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .sony-card:hover { border-color: #ff0055; transform: scale(1.02); }
+        :root {
+            --bg: #0b0228;
+            --card: #140836;
+            --header: #07011a;
+            --accent: #ff2e93;
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding-bottom: 50px;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--header);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo { font-family: 'Fjalla One', sans-serif; font-size: 22px; color: var(--accent); font-style: italic; letter-spacing: 1px; }
+
+        /* CATEGORIES BAR */
+        .categories-container {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none; /* Firefox */
+        }
+        .categories-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+        .cat-btn {
+            padding: 8px 20px;
+            background: var(--card);
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .cat-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(255, 46, 147, 0.4);
+        }
+
+        /* SEARCH BAR */
+        .search-container {
+            padding: 0 20px 15px 20px;
+        }
+        .search-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+        }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+        .card-img-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            position: relative;
+        }
+        .card-img { width: 100%; height: 100%; object-fit: contain; }
+
+        .badge-cat {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            padding: 3px 8px;
+            font-size: 8px;
+            font-weight: 800;
+            border-radius: 4px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .live-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ff3b3b;
+            padding: 3px 8px;
+            font-size: 8px;
+            font-weight: 900;
+            border-radius: 4px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .card-body { padding: 12px; }
+        .match-title { font-family: 'Fjalla One', sans-serif; font-size: 14px; line-height: 1.2; margin-bottom: 8px; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        
+        .btn-watch {
+            background: var(--accent);
+            text-align: center;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
+        }
     </style>
 </head>
-<body class="p-4">
-    <div class="max-w-xl mx-auto">
-        <header class="flex justify-between items-center mb-6">
-            <h1 id="displayTitle" class="text-xl font-black uppercase text-pink-500 tracking-tighter">SOURCE</h1>
-            <a href="index.html" class="text-xs font-bold bg-white/5 px-4 py-2 rounded-full border border-white/10">HOME</a>
-        </header>
+<body>
 
-        <div id="matchGrid" class="grid grid-cols-2 gap-4"></div>
+<header>
+    <div class="logo">FANCODE <span style="color:white">LIVE</span></div>
+    <i class="fa-solid fa-bell" style="font-size: 16px; opacity: 0.6;"></i>
+</header>
+
+<div id="categories" class="categories-container">
+    <div class="cat-btn active" onclick="filterData('All', this)">ALL SPORTS</div>
+</div>
+
+<div class="search-container">
+    <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass" style="opacity: 0.4;"></i>
+        <input type="text" id="searchInput" placeholder="Search for matches, teams...">
     </div>
+</div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const sourceName = params.get('source') || "SONY";
-        document.getElementById('displayTitle').innerText = sourceName;
+<div id="grid" class="grid">
+    <div class="col-span-full text-center py-20 opacity-40 italic">Syncing Live Streams...</div>
+</div>
 
-        async function parseSonyM3U() {
-            const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
-            const M3U_URL = sources[sourceName.toUpperCase()];
-            const grid = document.getElementById('matchGrid');
+<script>
+    const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json?v=' + Date.now();
+    let allMatches = [];
 
-            if(!M3U_URL) return;
+    async function loadData() {
+        const grid = document.getElementById('grid');
+        try {
+            const res = await fetch(JSON_URL);
+            allMatches = await res.json();
+            
+            // Step 1: Automatically generate categories from JSON
+            const categoriesDiv = document.getElementById('categories');
+            const uniqueCats = ['All', ...new Set(allMatches.map(m => m.category || 'General'))];
+            
+            categoriesDiv.innerHTML = '';
+            uniqueCats.forEach(cat => {
+                const btn = document.createElement('div');
+                btn.className = `cat-btn ${cat === 'All' ? 'active' : ''}`;
+                btn.innerText = cat === 'All' ? 'ALL SPORTS' : cat;
+                btn.onclick = () => filterData(cat, btn);
+                categoriesDiv.appendChild(btn);
+            });
 
-            try {
-                const res = await fetch(M3U_URL);
-                const data = await res.text();
-                const lines = data.split('\n');
-                
-                let cur = {};
-                lines.forEach(line => {
-                    if (line.startsWith('#EXTINF:')) {
-                        const logoMatch = line.match(/tvg-logo="([^"]+)"/);
-                        cur.thumb = logoMatch ? logoMatch[1] : '';
-                        cur.title = line.split(',')[1] || "Sony Channel";
-                    } else if (line.startsWith('http')) {
-                        const stream = line.trim();
-                        grid.innerHTML += `
-                        <div class="sony-card rounded-2xl overflow-hidden p-3 cursor-pointer text-center" 
-                             onclick="location.href='player.html?url=${encodeURIComponent(stream)}&title=${encodeURIComponent(cur.title)}'">
-                            <img src="${cur.thumb}" class="w-full aspect-square rounded-xl object-contain bg-black mb-3 p-2">
-                            <div class="font-bold text-[11px] truncate uppercase">${cur.title}</div>
-                        </div>`;
-                        cur = {};
-                    }
-                });
-            } catch (e) { console.error("M3U Error"); }
+            render(allMatches);
+        } catch (e) {
+            grid.innerHTML = "<div class='col-span-full text-center text-red-500'>Failed to load data!</div>";
         }
-        window.onload = parseSonyM3U;
-    </script>
+    }
+
+    function render(data) {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        data.forEach(m => {
+            const link = m.link || m.iframeSrc;
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => location.href = `player.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(m.name)}`;
+            
+            card.innerHTML = `
+                <div class="card-img-container">
+                    <img src="${m.logo}" class="card-img" onerror="this.src='https://via.placeholder.com/300x168/000/fff?text=No+Logo'">
+                    <span class="badge-cat">${m.category || 'LIVE'}</span>
+                    <span class="live-label">LIVE</span>
+                </div>
+                <div class="card-body">
+                    <div class="match-title">${m.name}</div>
+                    <div class="btn-watch"><i class="fa-solid fa-play mr-1"></i> WATCH NOW</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Category Filter Logic
+    function filterData(cat, btn) {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filtered = (cat === 'All') ? allMatches : allMatches.filter(m => (m.category || 'General') === cat);
+        render(filtered);
+    }
+
+    // Search Logic
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        const searched = allMatches.filter(m => m.name.toLowerCase().includes(val));
+        render(searched);
+    });
+
+    window.onload = loadData;
+</script>
+
 </body>
 </html>
