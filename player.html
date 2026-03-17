@@ -19,191 +19,122 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background: var(--bg);
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Ambient Glow Background */
-        .ambient-glow {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80%; height: 60%; background: var(--accent);
-            filter: blur(150px); opacity: 0.1; z-index: -1;
-        }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
 
         /* Top Bar */
-        .player-nav {
-            width: 100%; padding: 15px 25px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            position: sticky; top: 0; z-index: 100;
-            border-bottom: 1px solid var(--border);
-        }
+        .player-nav { width: 100%; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+        .back-btn { text-decoration: none; color: white; font-size: 0.7rem; font-weight: 800; padding: 8px 16px; background: var(--glass); border-radius: 10px; border: 1px solid var(--border); }
 
-        .back-btn {
-            text-decoration: none; color: white; font-size: 0.7rem; font-weight: 800;
-            padding: 8px 16px; background: var(--glass); border-radius: 10px;
-            border: 1px solid var(--border); transition: 0.3s;
-        }
+        /* Theater Mode Toggle */
+        .theater-active .player-nav { display: none; }
+        .theater-active .video-container { width: 100vw; max-width: 100vw; height: 100vh; margin-top: 0; border-radius: 0; }
 
-        /* Video Stage */
-        .video-container {
-            width: 95%; max-width: 1100px; aspect-ratio: 16 / 9;
-            background: #000; margin-top: 20px; border-radius: 24px;
-            overflow: hidden; border: 1px solid var(--border);
-            position: relative; box-shadow: 0 0 50px rgba(0,0,0,1);
-        }
-
+        /* Video Container */
+        .video-container { width: 95%; max-width: 1100px; aspect-ratio: 16 / 9; background: #000; margin-top: 20px; border-radius: 24px; overflow: hidden; border: 1px solid var(--border); position: relative; box-shadow: 0 0 50px rgba(255, 0, 85, 0.05); }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Tactical Status Bar */
-        .status-bar {
-            width: 95%; max-width: 1100px; padding: 12px 20px;
-            display: flex; justify-content: space-between;
-            font-size: 0.6rem; font-weight: 800; color: #555;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .status-item span { color: var(--neon-blue); }
+        /* Controls Panel */
+        .controls-panel { margin: 15px 0 40px; width: 95%; max-width: 1100px; padding: 20px; background: var(--glass); border-radius: 24px; border: 1px solid var(--border); }
 
-        /* Server Controls */
-        .controls-panel {
-            margin: 10px 0 40px; width: 95%; max-width: 1100px;
-            padding: 24px; background: var(--glass);
-            border-radius: 24px; backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-        }
+        /* NEW: Quality Selector Bar */
+        .quality-bar { display: flex; gap: 8px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+        .q-tag { padding: 6px 12px; font-size: 0.6rem; font-weight: 900; background: #111; border: 1px solid #222; border-radius: 6px; color: #555; cursor: pointer; transition: 0.3s; }
+        .q-tag.active { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
 
+        /* Server Grid */
         .server-grid { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin-bottom: 20px; }
-        .server-grid::-webkit-scrollbar { display: none; }
+        .server-btn { padding: 12px 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: #666; border-radius: 12px; cursor: pointer; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+        .server-btn.active { background: #fff; color: #000; border-color: #fff; }
 
-        .server-btn {
-            padding: 12px 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-            color: #666; border-radius: 12px; cursor: pointer; font-size: 0.7rem;
-            font-weight: 700; transition: 0.3s; white-space: nowrap;
-        }
-
-        .server-btn.active {
-            background: #fff; color: #000; border-color: #fff;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
-        }
-
-        /* Meta Info */
-        .stream-meta {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            padding-top: 20px; border-top: 1px solid var(--border);
-        }
-
-        .live-badge {
-            background: rgba(255, 0, 85, 0.1); color: var(--accent);
-            padding: 6px 12px; border-radius: 8px; font-size: 0.6rem;
-            font-weight: 900; display: inline-flex; align-items: center; gap: 6px;
-        }
+        /* Meta & Actions */
+        .stream-meta { display: flex; justify-content: space-between; align-items: center; }
+        .live-badge { background: rgba(255, 0, 85, 0.1); color: var(--accent); padding: 6px 12px; border-radius: 8px; font-size: 0.6rem; font-weight: 900; display: inline-flex; align-items: center; gap: 6px; }
         .pulse { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-anim 1s infinite; }
+        
+        .action-btn { background: var(--glass); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; cursor: pointer; font-size: 0.7rem; }
 
-        @keyframes pulse-anim { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .title-area h2 { font-family: 'Space Grotesk'; font-size: 1.3rem; margin-top: 8px; }
-
-        @media (max-width: 768px) {
-            .video-container { border-radius: 12px; width: 100%; margin-top: 0; border: none; }
-            .controls-panel { border-radius: 0; width: 100%; border: none; background: transparent; }
-        }
+        @keyframes pulse-anim { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
-<body>
-
-    <div class="ambient-glow" id="ambient"></div>
+<body id="mainBody">
 
     <nav class="player-nav">
         <a href="index.html" class="back-btn">← EXIT</a>
-        <div style="font-family: 'Space Grotesk'; font-weight: 900; font-size: 1rem;">ELITE<span>STREAM</span></div>
-        <div style="font-size: 0.5rem; color: var(--neon-green); font-weight: 900;">SIGNAL: EXCELLENT</div>
+        <div style="font-family: 'Space Grotesk'; font-weight: 900; font-size: 1rem;">ELITE<span>PLAYER</span></div>
+        <button class="action-btn" onclick="toggleTheater()">🎭 THEATER</button>
     </nav>
-
-    <div class="status-bar">
-        <div style="display:flex; gap:15px;">
-            <div class="status-item">PING: <span id="ping">12MS</span></div>
-            <div class="status-item">BITRATE: <span>8.2 MBPS</span></div>
-        </div>
-        <div class="status-item">BUFFER: <span style="color:var(--neon-green)">STABLE</span></div>
-    </div>
 
     <div class="video-container" id="player-box">
         <iframe id="main-player" src="" allowfullscreen allow="autoplay"></iframe>
     </div>
 
     <div class="controls-panel">
-        <div style="font-size: 0.6rem; color: #444; font-weight: 900; margin-bottom: 15px; letter-spacing: 1px;">SWITCH DATA SERVER</div>
-        
-        <div class="server-grid">
-            <button id="btn1" class="server-btn active" onclick="switchPro(1)">SERVER 01 (HD)</button>
-            <button id="btn2" class="server-btn" onclick="switchPro(2)">SERVER 02 (FAST)</button>
-            <button id="btn3" class="server-btn" onclick="switchPro(3)">SERVER 03 (BACKUP)</button>
+        <div style="font-size: 0.55rem; color: #444; margin-bottom: 8px; font-weight: 900; letter-spacing: 1px;">STREAM QUALITY</div>
+        <div class="quality-bar">
+            <div class="q-tag" onclick="setQuality('4K', this)">4K ULTRA</div>
+            <div class="q-tag active" onclick="setQuality('1080p', this)">1080p HDR</div>
+            <div class="q-tag" onclick="setQuality('720p', this)">720p (DATA SAVER)</div>
+            <div class="q-tag" onclick="setQuality('AUTO', this)">AUTO</div>
         </div>
 
+        <div style="font-size: 0.55rem; color: #444; margin-bottom: 8px; font-weight: 900; letter-spacing: 1px;">SWITCH SERVER</div>
+        <div class="server-grid" id="serverGrid">
+            </div>
+
         <div class="stream-meta">
-            <div class="title-area">
+            <div>
                 <div class="live-badge"><div class="pulse"></div> LIVE BROADCAST</div>
-                <h2 id="st-title">LOADING STREAM...</h2>
+                <h2 id="st-title" style="font-family: 'Space Grotesk'; font-size: 1.2rem; margin-top: 5px;">STREAMING...</h2>
             </div>
-            <div style="text-align: right;">
-                <p style="font-size: 0.5rem; color: #444; margin-bottom: 4px;">ENCRYPTION: AES-256</p>
-                <div style="font-size: 0.6rem; color: var(--neon-blue); font-weight: 900;">4K UHD ENABLED</div>
-            </div>
+            <button class="action-btn" onclick="location.reload()" style="color: var(--neon-green);">🔄 REFRESH</button>
         </div>
     </div>
 
     <script>
-        // Data Retrieval Logic
         const streams = JSON.parse(localStorage.getItem('elite_data')) || [];
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         const currentStream = streams[id];
 
         function initPlayer() {
-            if(!currentStream) {
-                document.getElementById('st-title').innerText = "STREAM NOT FOUND";
-                return;
-            }
+            if(!currentStream) return alert("Stream not found!");
             
             document.getElementById('st-title').innerText = currentStream.title;
-            // Load Server 1 by default
-            document.getElementById('main-player').src = currentStream.url1 + "?autoplay=1";
             
-            // GSAP Intro
-            gsap.from(".video-container", { opacity: 0, scale: 0.9, duration: 1 });
+            // Generate Server Buttons
+            const grid = document.getElementById('serverGrid');
+            for(let i=1; i<=3; i++) {
+                if(currentStream['url'+i]) {
+                    grid.innerHTML += `<button id="s${i}" class="server-btn ${i==1?'active':''}" onclick="switchServer(${i})">PIPELINE 0${i}</button>`;
+                }
+            }
+            
+            switchServer(1);
         }
 
-        function switchPro(serverNum) {
+        function switchServer(num) {
             const player = document.getElementById('main-player');
             const box = document.getElementById('player-box');
-            let url = currentStream['url' + serverNum];
+            let url = currentStream['url' + num];
 
-            if(!url) { alert("Server " + serverNum + " not available!"); return; }
-
-            gsap.to(box, { opacity: 0, filter: "blur(10px)", duration: 0.3, onComplete: () => {
-                player.src = url + "?autoplay=1";
-                
-                // Update Buttons
+            gsap.to(box, { opacity: 0, scale: 0.98, duration: 0.3, onComplete: () => {
+                player.src = url;
                 document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById('btn' + serverNum).classList.add('active');
-                
-                gsap.to(box, { opacity: 1, filter: "blur(0px)", duration: 0.5 });
+                document.getElementById('s'+num).classList.add('active');
+                gsap.to(box, { opacity: 1, scale: 1, duration: 0.4 });
             }});
         }
 
-        // Fake Ping Logic
-        setInterval(() => {
-            const ms = Math.floor(Math.random() * (20 - 10) + 10);
-            document.getElementById('ping').innerText = ms + "MS";
-        }, 2000);
+        function setQuality(q, btn) {
+            document.querySelectorAll('.q-tag').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            // Visual feedback for quality change
+            gsap.fromTo("#player-box", {filter: "contrast(1.5)"}, {filter: "contrast(1)", duration: 0.5});
+        }
+
+        function toggleTheater() {
+            document.getElementById('mainBody').classList.toggle('theater-active');
+        }
 
         window.onload = initPlayer;
     </script>
