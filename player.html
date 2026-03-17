@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | 4K HDR Player</title>
+    <title>ELITE PLAYER | 4K HDR</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -11,49 +11,60 @@
 
     <style>
         :root { --accent: #ff0055; --bg: #000; --border: rgba(255,255,255,0.1); }
-        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; margin: 0; padding: 0; overflow: hidden; }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; margin: 0; overflow: hidden; }
         
-        .player-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #000; }
+        .player-wrapper { width: 100vw; height: 100vh; display: flex; flex-direction: column; position: relative; }
         
-        /* Tactical Video Frame */
-        #video-wrapper { position: relative; width: 100%; flex-grow: 1; background: #000; display: flex; align-items: center; justify-content: center; }
-        video { width: 100%; height: 100%; max-height: 100vh; outline: none; box-shadow: 0 0 50px rgba(255, 0, 85, 0.1); }
+        /* Video Area */
+        #video-container { flex-grow: 1; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
+        video { width: 100%; height: 100%; max-height: 100vh; outline: none; }
 
-        /* Floating Back Button */
-        .back-btn { position: absolute; top: 20px; left: 20px; z-index: 100; background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid var(--border); color: white; text-decoration: none; font-weight: 900; font-size: 0.8rem; }
+        /* Back Button */
+        .exit-btn { position: absolute; top: 20px; left: 20px; z-index: 100; background: rgba(0,0,0,0.6); padding: 10px 18px; border-radius: 50px; border: 1px solid var(--border); color: white; text-decoration: none; font-weight: 900; font-size: 0.75rem; backdrop-filter: blur(10px); }
 
-        /* Status Bar */
-        .bottom-info { position: absolute; bottom: 0; width: 100%; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 10; display: flex; justify-content: space-between; align-items: flex-end; }
-        .title { font-size: 1.2rem; font-weight: 900; text-shadow: 0 2px 10px #000; }
-        .quality-tag { background: var(--accent); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; letter-spacing: 1px; }
+        /* Bottom Info Bar */
+        .player-meta { position: absolute; bottom: 0; width: 100%; padding: 25px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 10; display: flex; justify-content: space-between; align-items: flex-end; }
+        .m-title { font-size: 1.3rem; font-weight: 900; text-shadow: 0 2px 15px rgba(0,0,0,0.5); }
+        .live-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 10px var(--accent); }
 
-        .error-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; display: none; z-index: 20; }
-        .loader { width: 50px; height: 50px; border: 5px solid #111; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        /* Loader & Error */
+        .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; z-index: 50; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #111; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-box { display: none; text-align: center; z-index: 60; position: absolute; }
+        .btn-retry { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 900; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="player-container">
-        <a href="index.html" class="back-btn">← EXIT</a>
+    <div class="player-wrapper">
+        <a href="index.html" class="exit-btn">← CLOSE</a>
 
-        <div id="video-wrapper">
-            <div id="loader" class="loader"></div>
-            <div id="error-screen" class="error-msg">
-                <h3 style="color:var(--accent);">SIGNAL LOST</h3>
-                <p style="font-size:0.7rem; color:#555;">Link Expired or Region Blocked</p>
-                <button onclick="location.reload()" style="margin-top:10px; background:#222; color:white; border:none; padding:8px 15px; border-radius:5px;">RETRY</button>
+        <div id="video-container">
+            <div id="loader" class="loading-screen">
+                <div class="spinner"></div>
             </div>
-            
-            <video id="main-player" controls poster="" playsinline crossorigin="anonymous"></video>
+
+            <div id="error-ui" class="error-box">
+                <h2 style="color:var(--accent); font-weight:900;">SIGNAL LOST</h2>
+                <p style="font-size:0.8rem; color:#666;">Link Expired or Unauthorized Access</p>
+                <button class="btn-retry" onclick="location.reload()">RE-CONNECT</button>
+            </div>
+
+            <video id="elite-player" controls playsinline crossorigin="anonymous"></video>
         </div>
 
-        <div class="bottom-info">
+        <div class="player-meta">
             <div>
-                <div id="displayTitle" class="title">CONNECTING...</div>
-                <div style="font-size:0.6rem; color:#888; font-weight:900;">SIGNAL SOURCE: CLOUD PIPELINE</div>
+                <div style="font-size:0.6rem; font-weight:900; color:#888; letter-spacing:1px; margin-bottom:5px;">
+                    <span class="live-dot"></span> BROADCASTING LIVE
+                </div>
+                <div id="videoTitle" class="m-title">ELITE BROADCAST</div>
             </div>
-            <div class="quality-tag">4K HDR10+</div>
+            <div style="text-align:right;">
+                <div style="background:#fff; color:#000; padding:3px 8px; border-radius:4px; font-size:0.6rem; font-weight:900;">4K HDR</div>
+            </div>
         </div>
     </div>
 
@@ -63,29 +74,32 @@
     const streamTitle = params.get('title');
 
     window.onload = () => {
-        if (streamTitle) document.getElementById('displayTitle').innerText = decodeURIComponent(streamTitle);
+        if (streamTitle) document.getElementById('videoTitle').innerText = decodeURIComponent(streamTitle);
         
-        if (streamUrl && streamUrl !== "null" && streamUrl !== "OFFLINE") {
-            const finalUrl = decodeURIComponent(streamUrl);
-            initializePlayer(finalUrl);
+        if (streamUrl && streamUrl !== "null" && streamUrl !== "undefined") {
+            const cleanUrl = decodeURIComponent(streamUrl);
+            startStreaming(cleanUrl);
         } else {
-            showError("No Stream URL Provided");
+            showError("No Signal URL Found");
         }
     };
 
-    function initializePlayer(url) {
-        const video = document.getElementById('main-player');
+    function startStreaming(url) {
+        const video = document.getElementById('elite-player');
         const loader = document.getElementById('loader');
 
         if (Hls.isSupported()) {
             const hls = new Hls({
-                // Sony/Akamai User-Agent Bypass Logic
+                // SonyLiv/Akamai Bypass Config
                 xhrSetup: function (xhr, url) {
-                    xhr.withCredentials = false; // Akamai ke liye aksar false chahiye hota hai
+                    xhr.withCredentials = false;
+                    // Injecting Official Android User-Agent
                     xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Linux; Android 10; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36');
+                    // Injecting SonyLiv Referer (Some links need this)
+                    xhr.setRequestHeader('Referer', 'https://www.sonyliv.com/');
                 },
-                manifestLoadingMaxRetry: 4,
-                levelLoadingMaxRetry: 4
+                manifestLoadingMaxRetry: 5,
+                levelLoadingMaxRetry: 5
             });
 
             hls.loadSource(url);
@@ -93,21 +107,19 @@
             
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 loader.style.display = 'none';
-                video.play().catch(() => {
-                    console.log("Autoplay blocked, user interaction needed");
-                });
+                video.play().catch(e => console.log("Autoplay blocked"));
             });
 
             hls.on(Hls.Events.ERROR, (event, data) => {
                 if (data.fatal) {
-                    loader.style.display = 'none';
-                    showError();
+                    console.error("HLS Fatal Error:", data.type);
+                    showError("Link Expired or Token Mismatch");
                     hls.destroy();
                 }
             });
         } 
         else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            // Safari Fallback
+            // Safari/iPhone Support
             video.src = url;
             video.addEventListener('loadedmetadata', () => {
                 loader.style.display = 'none';
@@ -118,8 +130,8 @@
 
     function showError(msg) {
         document.getElementById('loader').style.display = 'none';
-        document.getElementById('error-screen').style.display = 'block';
-        if(msg) document.querySelector('#error-screen p').innerText = msg;
+        document.getElementById('error-ui').style.display = 'block';
+        if(msg) document.querySelector('#error-ui p').innerText = msg;
     }
 </script>
 </body>
