@@ -27,7 +27,7 @@
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
 
-        /* Navbar with Blur */
+        /* Navbar */
         .nav-container {
             position: sticky; top: 0; width: 100%; padding: 18px 25px;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
@@ -37,7 +37,7 @@
         .logo { font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 900; letter-spacing: -1px; }
         .logo span { color: var(--accent); text-shadow: 0 0 15px var(--accent); }
 
-        /* Score Ticker Improvements */
+        /* Score Ticker */
         .score-outer { width: 100%; padding: 10px 20px; }
         .score-console { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
         .score-item {
@@ -47,7 +47,7 @@
             font-size: 0.7rem; font-weight: 700; color: #aaa;
         }
 
-        /* Bento Grid: Premium Spacing */
+        /* Bento Grid */
         .bento-grid {
             padding: 10px 20px 40px; 
             display: grid;
@@ -68,7 +68,7 @@
             .tall-unit { grid-row: span 2; }
         }
 
-        /* CARD DESIGN: Cinematic Look */
+        /* CARD DESIGN */
         .card-unit {
             background: var(--card-inner);
             border: 1px solid var(--border-glow);
@@ -80,121 +80,127 @@
             justify-content: flex-end;
             min-height: 220px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: border 0.3s, opacity 0.3s;
+            cursor: pointer;
         }
 
-        /* Background Image Logic */
         .card-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; opacity: 0.4; z-index: 0;
+            object-fit: cover; opacity: 0.3; z-index: 0;
             transition: 0.5s ease;
         }
 
-        .card-unit:hover .card-bg { opacity: 0.6; transform: scale(1.05); }
-        .card-unit:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* FIXED: Highlight Logic Classes */
+        .card-unit.active-card {
+            border: 2px solid var(--accent) !important;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
+            opacity: 1 !important;
+        }
+        .card-unit.active-card .card-bg { opacity: 0.7; transform: scale(1.05); }
+        .card-unit:not(.active-card) { opacity: 0.6; }
 
         .card-content { position: relative; z-index: 2; }
-
         .badge {
             position: absolute; top: 20px; left: 25px; z-index: 2;
             font-size: 0.6rem; font-weight: 900; background: var(--accent);
-            padding: 5px 12px; border-radius: 20px; box-shadow: 0 4px 10px rgba(255,0,85,0.3);
+            padding: 5px 12px; border-radius: 20px;
         }
 
         .title { font-family: 'Space Grotesk'; font-size: 1.6rem; margin-bottom: 5px; text-transform: uppercase; }
         .description { font-size: 0.85rem; color: #999; margin-bottom: 18px; }
 
         .btn-action {
-            display: inline-block; padding: 12px 28px; background: white; color: black;
+            display: inline-block; padding: 10px 24px; background: white; color: black;
             border-radius: 12px; text-decoration: none; font-size: 0.75rem; font-weight: 800;
-            transition: 0.3s;
         }
-        .btn-action:hover { background: var(--accent); color: white; transform: scale(1.05); }
 
         .live-dot { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
 
     <nav class="nav-container">
         <div class="logo">ELITE<span>STREAM</span></div>
-        <div style="font-size: 0.6rem; color: #666; font-weight: 700;">SERVER: SINGAPORE-01</div>
+        <div style="font-size: 0.6rem; color: #666; font-weight: 700;">V12.0 FIXED</div>
     </nav>
 
     <div class="score-outer">
         <div class="score-console">
-            <div class="score-item"><div class="live-dot"></div><span>F1 MONACO: LAP 12/78</span></div>
-            <div class="score-item"><div class="live-dot" style="background:orange;"></div><span>IPL: MI vs CSK (LIVE)</span></div>
-            <div class="score-item"><span>NEXT: UFC 300 - 08:00 PM</span></div>
+            <div class="score-item"><div class="live-dot"></div><span>F1: LAP 12/78</span></div>
+            <div class="score-item"><div class="live-dot" style="background:orange;"></div><span>IPL: LIVE NOW</span></div>
+            <div class="score-item"><span>UFC 300: 08:00 PM</span></div>
         </div>
     </div>
 
-    <main class="bento-grid">
-        <div class="card-unit hero-unit">
+    <main class="bento-grid" id="mainGrid">
+        <div class="card-unit hero-unit active-card" data-id="1">
             <img src="https://images.unsplash.com/photo-1547447134-cd3f5c716030?q=80&w=1000" class="card-bg">
-            <div class="badge">4K ULTRA HD</div>
+            <div class="badge">4K ULTRA</div>
             <div class="card-content">
-                <h2 class="title">F1 WORLD CHAMPIONSHIP</h2>
-                <p class="description">Stream every turn and overtake in high definition.</p>
-                <a href="player.html" class="btn-action">Start Streaming</a>
+                <h2 class="title">FORMULA 1</h2>
+                <p class="description">Live from Monaco GP.</p>
+                <a href="player.html" class="btn-action">Watch Now</a>
             </div>
         </div>
 
-        <div class="card-unit" style="border-bottom: 4px solid var(--neon-green);">
+        <div class="card-unit" data-id="2">
             <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=1000" class="card-bg">
             <div class="card-content">
-                <h2 class="title" style="color: var(--neon-green);">IPL 2025</h2>
-                <p class="description">Live matches & highlights.</p>
+                <h2 class="title" style="color: var(--neon-green);">IPL LIVE</h2>
+                <p class="description">MI vs CSK - Server Active.</p>
                 <a href="#" class="btn-action">Watch</a>
             </div>
         </div>
 
-        <div class="card-unit tall-unit">
+        <div class="card-unit tall-unit" data-id="3">
             <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1000" class="card-bg">
             <div class="card-content">
-                <h2 class="title">CINEMA</h2>
-                <p class="description">New releases this Friday.</p>
+                <h2 class="title">MOVIES</h2>
+                <p class="description">Latest OTT releases.</p>
                 <a href="#" class="btn-action">Browse</a>
             </div>
         </div>
 
-        <div class="card-unit" style="background: linear-gradient(to bottom, #111, #000);">
+        <div class="card-unit" data-id="4" style="background: #111;">
             <div class="card-content">
-                <h2 class="title" style="font-size: 1rem; color: var(--neon-blue);">Server Status</h2>
-                <p class="description">Ping: 24ms<br>Load: 12%</p>
-                <div style="height: 4px; background: #222; border-radius: 10px;"><div style="width: 80%; height: 100%; background: var(--neon-blue); border-radius: 10px;"></div></div>
+                <h2 class="title" style="font-size: 1rem; color: var(--neon-blue);">SERVER</h2>
+                <p class="description">Status: Optimal<br>Ping: 18ms</p>
             </div>
         </div>
 
-        <div class="card-unit wide-unit">
-            <img src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?q=80&w=1000" class="card-bg" style="opacity: 0.2;">
+        <div class="card-unit wide-unit" data-id="5">
+            <img src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?q=80&w=1000" class="card-bg">
             <div class="card-content">
-                <h2 class="title">Premium Experience</h2>
-                <p class="description">No Ads. No Buffering. Only Pure Entertainment.</p>
-                <a href="#" class="btn-action" style="background: var(--accent); color: white;">Upgrade Pro</a>
+                <h2 class="title">PREMIUM</h2>
+                <p class="description">Upgrade for Ad-free experience.</p>
+                <a href="#" class="btn-action" style="background:var(--accent); color:white;">Go Pro</a>
             </div>
         </div>
     </main>
 
     <script>
-        // Staggered entrance animation
-        gsap.from(".card-unit", { 
-            opacity: 0, 
-            scale: 0.9, 
-            y: 30, 
-            stagger: 0.15, 
-            duration: 1, 
-            ease: "expo.out" 
+        // GSAP Initialization
+        gsap.from(".card-unit", { opacity: 0, y: 30, stagger: 0.1, duration: 0.8, ease: "power2.out" });
+
+        // Highlight Switcher Logic
+        const cards = document.querySelectorAll('.card-unit');
+
+        cards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove active from all
+                cards.forEach(c => c.classList.remove('active-card'));
+                
+                // Add active to clicked
+                this.classList.add('active-card');
+                
+                // Optional: GSAP Pop effect on click
+                gsap.fromTo(this, {scale: 0.98}, {scale: 1, duration: 0.3, ease: "back.out(2)"});
+            });
         });
 
-        // Logo Glow Pulse
-        gsap.to(".logo span", {
-            textShadow: "0 0 25px #ff0055, 0 0 5px #ff0055",
-            repeat: -1,
-            yoyo: true,
-            duration: 1.5
-        });
+        // Logo Glow Effect
+        gsap.to(".logo span", { textShadow: "0 0 20px #ff0055", repeat: -1, yoyo: true, duration: 1.5 });
     </script>
 </body>
 </html>
