@@ -2,65 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | Dynamic Category</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ELITE | Category View</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
     <style>
-        :root { --accent: #ff0055; --bg: #000; --border: rgba(255,255,255,0.08); }
-        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-        @media (min-width: 768px) { .grid { grid-template-columns: repeat(4, 1fr); } }
-        .card { background: #0d0d0d; border-radius: 18px; border: 1px solid var(--border); overflow: hidden; }
-        .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-        .card-info { padding: 12px; }
-        .card-info h3 { font-size: 0.85rem; margin-bottom: 5px; }
-        .btn-watch { background: #fff; color: #000; padding: 5px 10px; border-radius: 5px; font-size: 0.65rem; font-weight: 800; text-decoration: none; display: inline-block; }
+        :root {
+            --accent: #ff0055;
+            --bg: #020202;
+            --card-glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Outfit', sans-serif; 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 0%, #1a0510 0%, #020202 50%);
+        }
+
+        /* --- Navbar --- */
+        .nav {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .back-btn {
+            text-decoration: none; color: white; font-size: 0.8rem; font-weight: 800;
+            padding: 10px 20px; background: var(--card-glass); border-radius: 12px;
+            border: 1px solid var(--border); transition: 0.3s;
+        }
+        .back-btn:hover { background: var(--accent); transform: translateX(-5px); }
+
+        .cat-title { font-family: 'Space Grotesk'; font-size: 1.5rem; text-transform: uppercase; color: var(--accent); }
+
+        /* --- Content Grid --- */
+        .container { padding: 30px 20px; max-width: 1300px; margin: 0 auto; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card-pro {
+            background: var(--card-glass); border-radius: 22px; border: 1px solid var(--border);
+            overflow: hidden; cursor: pointer; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .card-pro:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.2); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+
+        .img-box { width: 100%; aspect-ratio: 16/9; overflow: hidden; position: relative; }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) saturate(1.1); transition: 0.6s; }
+        .card-pro:hover .img-box img { transform: scale(1.1); }
+
+        .info-box { padding: 15px; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); }
+        .tag { font-size: 0.6rem; color: #888; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .title { font-size: 1rem; font-weight: 700; margin-top: 5px; color: #eee; }
+
+        /* --- Loading State --- */
+        .loader {
+            text-align: center; padding: 100px 0; font-size: 1.2rem; font-weight: 900;
+            color: #333; letter-spacing: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .cat-title { font-size: 1.1rem; }
+        }
     </style>
 </head>
 <body>
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h1 id="pageTitle" style="font-family:'Space Grotesk'; font-size:1.5rem; text-transform:uppercase;">Category</h1>
-        <a href="index.html" style="color:var(--accent); text-decoration:none; font-size:0.8rem; font-weight:800;">← BACK</a>
+
+    <nav class="nav">
+        <a href="index.html" class="back-btn">← HOME</a>
+        <div class="cat-title" id="displayTitle">SOURCE</div>
+        <div id="count" style="font-size: 0.6rem; background: #222; padding: 4px 10px; border-radius: 20px;">0 SIGNALS</div>
+    </nav>
+
+    <div class="container">
+        <div id="loading" class="loader">ESTABLISHING CONNECTION...</div>
+        <div class="grid" id="dataGrid"></div>
     </div>
 
-    <div class="grid" id="catGrid">Connecting to Signal...</div>
-
     <script>
+        // 1. Get Category Name from URL
         const params = new URLSearchParams(window.location.search);
-        const categoryName = params.get('name') ? params.get('name').toUpperCase() : "SPORTS";
-        document.getElementById('pageTitle').innerText = categoryName;
+        const sourceName = params.get('source') ? params.get('source').toUpperCase() : "LIVE";
+        document.getElementById('displayTitle').innerText = sourceName;
 
-        async function fetchSource() {
-            const mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
-            const url = mappings[categoryName];
-            const grid = document.getElementById('catGrid');
+        // 2. Fetch Logic
+        async function loadCategoryData() {
+            const grid = document.getElementById('dataGrid');
+            const loader = document.getElementById('loading');
+            
+            // Get mappings from Admin
+            const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
+            const jsonUrl = sources[sourceName];
 
-            if(!url) {
-                grid.innerHTML = `<div style="grid-column: span 2; color:#555;">No Source Link added for this category in Admin Panel.</div>`;
+            if (!jsonUrl) {
+                loader.innerText = "NO SOURCE LINK FOUND IN ADMIN";
+                loader.style.color = "var(--accent)";
                 return;
             }
 
             try {
-                const res = await fetch(url);
-                const data = await res.json();
-                grid.innerHTML = ""; // Clear loader
+                const response = await fetch(jsonUrl);
+                const data = await response.json();
+                
+                loader.style.display = 'none';
+                document.getElementById('count').innerText = `${data.length} SIGNALS ACTIVE`;
 
                 data.forEach((item, index) => {
-                    // Yahan hum unique ID pass kar rahe hain jisme Category name bhi hai
                     grid.innerHTML += `
-                        <div class="card" onclick="location.href='player.html?source=${categoryName}&id=${index}'">
-                            <img src="${item.thumb}">
-                            <div class="card-info">
-                                <h3>${item.title}</h3>
-                                <span class="btn-watch">Watch Now</span>
+                        <div class="card-pro" onclick="playStream('${encodeURIComponent(item.url1 || item.url)}', '${encodeURIComponent(item.title)}')">
+                            <div class="img-box">
+                                <img src="${item.thumb}" alt="thumbnail">
+                            </div>
+                            <div class="info-box">
+                                <span class="tag">${sourceName} • 4K HDR</span>
+                                <div class="title">${item.title}</div>
                             </div>
                         </div>`;
                 });
-            } catch (err) {
-                grid.innerText = "Error: JSON source link is invalid or has CORS issues.";
+
+                // GSAP Animation
+                gsap.from(".card-pro", { opacity: 0, y: 30, stagger: 0.1, duration: 0.8, ease: "power3.out" });
+
+            } catch (error) {
+                loader.innerText = "FAILED TO FETCH SOURCE DATA";
+                loader.style.color = "var(--accent)";
+                console.error(error);
             }
         }
-        window.onload = fetchSource;
+
+        function playStream(url, title) {
+            // Redirect to player with URL and Title
+            window.location.href = `player.html?url=${url}&title=${title}`;
+        }
+
+        window.onload = loadCategoryData;
     </script>
 </body>
 </html>
