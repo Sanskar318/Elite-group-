@@ -2,101 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | DPlayer Engine</title>
+    <title>ELITE | DPlayer M3U Engine</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/dplayer@latest/dist/DPlayer.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; font-family: 'Outfit', sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        #dplayer { flex-grow: 1; width: 100%; height: 100%; }
-        .dplayer-logo { width: 40px !important; height: 40px !important; }
+        body, html { margin: 0; padding: 0; background: #000; height: 100%; overflow: hidden; }
+        #dplayer { width: 100%; height: 100vh; }
     </style>
 </head>
-<body class="text-white">
-
-    <header class="p-4 bg-slate-900 border-b border-white/5 flex justify-between items-center">
-        <h1 id="match-title" class="text-lg font-bold truncate text-sky-400">Signal Establishing...</h1>
-        <a href="index.html" class="text-[10px] font-bold border border-white/20 px-3 py-1 rounded-full">BACK</a>
-    </header>
-
+<body>
     <div id="dplayer"></div>
-
     <script>
-        const API_URL = 'https://raw.githubusercontent.com/jitendra-unatti/fancode/refs/heads/main/data/fancode.json';
-        
-        async function initDPlayer() {
-            const params = new URLSearchParams(window.location.search);
-            const matchId = params.get('id');
+        const params = new URLSearchParams(window.location.search);
+        const rawUrl = params.get('url');
 
-            if (!matchId) {
-                document.getElementById('match-title').innerText = "ERROR: NO MATCH ID";
-                return;
+        if (rawUrl) {
+            const decodedUrl = decodeURIComponent(rawUrl);
+            
+            // Format: link.m3u8|User-Agent=XYZ&Referer=ABC
+            const parts = decodedUrl.split('|');
+            const streamUrl = parts[0];
+            const headerString = parts[1] || "";
+
+            const headers = {};
+            if (headerString) {
+                headerString.split('&').forEach(pair => {
+                    const [k, v] = pair.split('=');
+                    if (k && v) headers[k] = v;
+                });
             }
 
-            try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                const match = data.matches.find(m => String(m.match_id) === String(matchId));
-
-                if (!match || !match.auto_streams) {
-                    throw new Error("Match signals are currently offline.");
+            const dp = new DPlayer({
+                container: document.getElementById('dplayer'),
+                autoplay: true,
+                theme: '#0ea5e9',
+                video: {
+                    url: streamUrl,
+                    type: 'customHls',
+                    customType: {
+                        customHls: function (video) {
+                            const hls = new Hls({
+                                xhrSetup: function (xhr) {
+                                    if (headers['User-Agent']) xhr.setRequestHeader('User-Agent', headers['User-Agent']);
+                                    if (headers['Referer']) xhr.setRequestHeader('Referer', headers['Referer']);
+                                }
+                            });
+                            hls.loadSource(video.src);
+                            hls.attachMedia(video);
+                        }
+                    }
                 }
-
-                document.getElementById('match-title').textContent = match.title;
-
-                // Manifest content aur Cookies extract karna
-                const manifestContent = match.auto_streams[0].auto;
-                const akamaiCookie = match.auto_streams[0].cookie;
-
-                // Blob Engine setup
-                const blob = new Blob([manifestContent], { type: 'application/x-mpegURL' });
-                const blobUrl = URL.createObjectURL(blob);
-
-                // DPlayer Initialization
-                const dp = new DPlayer({
-                    container: document.getElementById('dplayer'),
-                    autoplay: true,
-                    theme: '#0ea5e9',
-                    loop: false,
-                    screenshot: true,
-                    hotkey: true,
-                    preload: 'auto',
-                    logo: 'https://fancode.com/favicon.ico', // Aap apna logo de sakte hain
-                    video: {
-                        url: blobUrl,
-                        type: 'customHls',
-                        customType: {
-                            customHls: function (video, player) {
-                                const hls = new Hls({
-                                    xhrSetup: function (xhr) {
-                                        xhr.withCredentials = false;
-                                        // Akamai Bypass Headers
-                                        xhr.setRequestHeader('Cookie', akamaiCookie);
-                                        xhr.setRequestHeader('User-Agent', 'ReactNativeVideo/9.3.0 (Linux;Android 13) AndroidXMedia3/1.6.1');
-                                        xhr.setRequestHeader('Referer', 'https://fancode.com/');
-                                    }
-                                });
-                                hls.loadSource(video.src);
-                                hls.attachMedia(video);
-                            },
-                        },
-                    },
-                });
-
-                // Error Handling
-                dp.on('error', () => {
-                    console.log('Stream Error: Link Expired');
-                    document.getElementById('match-title').innerText = "SIGNAL EXPIRED - UPDATE JSON";
-                });
-
-            } catch (err) {
-                document.getElementById('match-title').innerText = err.message;
-            }
+            });
         }
-
-        window.onload = initDPlayer;
     </script>
 </body>
 </html>
