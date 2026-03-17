@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE | Dynamic Category</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent: #ff0055; --bg: #000; --border: rgba(255,255,255,0.08); }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        .card { background: #0d0d0d; border-radius: 18px; border: 1px solid var(--border); overflow: hidden; }
+        .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+        .card-info { padding: 12px; }
+        .card-info h3 { font-size: 0.85rem; margin-bottom: 5px; }
+        .btn-watch { background: #fff; color: #000; padding: 5px 10px; border-radius: 5px; font-size: 0.65rem; font-weight: 800; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1 id="pageTitle" style="font-family:'Space Grotesk'; font-size:1.5rem; text-transform:uppercase;">Category</h1>
+        <a href="index.html" style="color:var(--accent); text-decoration:none; font-size:0.8rem; font-weight:800;">← BACK</a>
+    </div>
+
+    <div class="grid" id="catGrid">Connecting to Signal...</div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const categoryName = params.get('name') ? params.get('name').toUpperCase() : "SPORTS";
+        document.getElementById('pageTitle').innerText = categoryName;
+
+        async function fetchSource() {
+            const mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
+            const url = mappings[categoryName];
+            const grid = document.getElementById('catGrid');
+
+            if(!url) {
+                grid.innerHTML = `<div style="grid-column: span 2; color:#555;">No Source Link added for this category in Admin Panel.</div>`;
+                return;
+            }
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                grid.innerHTML = ""; // Clear loader
+
+                data.forEach((item, index) => {
+                    // Yahan hum unique ID pass kar rahe hain jisme Category name bhi hai
+                    grid.innerHTML += `
+                        <div class="card" onclick="location.href='player.html?source=${categoryName}&id=${index}'">
+                            <img src="${item.thumb}">
+                            <div class="card-info">
+                                <h3>${item.title}</h3>
+                                <span class="btn-watch">Watch Now</span>
+                            </div>
+                        </div>`;
+                });
+            } catch (err) {
+                grid.innerText = "Error: JSON source link is invalid or has CORS issues.";
+            }
+        }
+        window.onload = fetchSource;
+    </script>
+</body>
+</html>
