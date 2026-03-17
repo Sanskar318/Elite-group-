@@ -2,65 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELITE SPORTS | Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --accent: #ff0055; --bg: #050505; --card: #121212; --border: rgba(255,255,255,0.08); }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        .navbar { position: sticky; top: 0; width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-bottom: 1px solid var(--border); }
-        .logo { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 900; color: var(--accent); }
-        .section-container { padding: 30px 20px; }
-        .section-title { font-family: 'Space Grotesk'; font-size: 1.2rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 10px; }
-        .category-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
-        .cat-card { min-width: 160px; height: 160px; background: var(--card); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; cursor: pointer; transition: 0.4s; flex-shrink: 0; }
-        .cat-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
-        .cat-card:hover { border-color: var(--accent); transform: scale(1.05); }
-        .cat-name { position: absolute; bottom: 15px; width: 100%; text-align: center; font-weight: 800; font-size: 0.9rem; }
-        .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .event-card { background: var(--card); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: 0.4s; }
-        .event-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-        .event-info { padding: 15px; }
-        #maint-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        :root { --accent: #0ea5e9; --bg: #02040a; --card: #0f172a; }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .cat-card { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
+        .cat-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 30px -10px var(--accent); }
     </style>
 </head>
-<body>
-    <div id="maint-screen"><h1>MAINTENANCE MODE</h1></div>
-    <nav class="navbar"><div class="logo">ELITE<span>SPORTS</span></div></nav>
-    <div class="section-container">
-        <h2 class="section-title">Streaming Sources</h2>
-        <div class="category-scroll" id="categoryHub"></div>
+<body class="pb-10">
+
+    <nav class="glass sticky top-0 z-50 p-4 flex justify-between items-center">
+        <div class="text-2xl font-black tracking-tighter text-white">ELITE<span class="text-sky-500">SPORTS</span></div>
+        <div class="text-[10px] font-bold bg-sky-500/20 text-sky-400 px-2 py-1 rounded">V17 PRO</div>
+    </nav>
+
+    <div class="px-5 mt-8">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <span class="w-1 h-6 bg-sky-500 rounded-full"></span> Signal Sources
+        </h2>
+        <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar" id="catContainer">
+            </div>
     </div>
-    <div class="section-container">
-        <h2 class="section-title">Manual Picks</h2>
-        <div class="live-grid" id="manualGrid"></div>
+
+    <div class="px-5 mt-6">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <span class="w-1 h-6 bg-red-500 rounded-full"></span> Top Signals
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="featuredGrid">
+            </div>
     </div>
+
     <script>
-        const config = JSON.parse(localStorage.getItem('elite_config')) || { master: true };
         const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
         const manuals = JSON.parse(localStorage.getItem('elite_data')) || [];
 
-        function init() {
-            if(!config.master) { document.getElementById('maint-screen').style.display='flex'; return; }
-            const hub = document.getElementById('categoryHub');
-            for(let cat in sources) {
-                hub.innerHTML += `<div class="cat-card" onclick="location.href='category.html?source=${cat}'">
-                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400">
-                    <div class="cat-name">${cat}</div>
+        function renderIndex() {
+            const catBox = document.getElementById('catContainer');
+            for(let key in sources) {
+                catBox.innerHTML += `
+                <div class="cat-card min-w-[140px] h-32 bg-slate-900 rounded-3xl relative overflow-hidden cursor-pointer" onclick="location.href='category.html?source=${key}'">
+                    <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=300" class="absolute inset-0 w-full h-full object-cover opacity-30">
+                    <div class="absolute bottom-4 w-full text-center font-black text-sm uppercase tracking-wider">${key}</div>
                 </div>`;
             }
-            const mGrid = document.getElementById('manualGrid');
+
+            const featBox = document.getElementById('featuredGrid');
             manuals.forEach(m => {
-                mGrid.innerHTML += `<div class="event-card" onclick="location.href='player.html?url=${encodeURIComponent(m.url1)}&title=${encodeURIComponent(m.title)}'">
-                    <img src="${m.thumb}" class="event-thumb">
-                    <div class="event-info"><h3>${m.title}</h3></div>
+                featBox.innerHTML += `
+                <div class="bg-slate-900 rounded-[2rem] overflow-hidden border border-white/5 cursor-pointer" onclick="location.href='player.html?url=${encodeURIComponent(m.url1)}&title=${encodeURIComponent(m.title)}'">
+                    <img src="${m.thumb}" class="w-full aspect-video object-cover">
+                    <div class="p-5">
+                        <div class="text-[10px] font-bold text-sky-500 uppercase tracking-widest mb-1">Live Signal</div>
+                        <div class="font-bold text-lg text-white truncate">${m.title}</div>
+                    </div>
                 </div>`;
             });
         }
-        window.onload = init;
+        window.onload = renderIndex;
     </script>
 </body>
 </html>
