@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ELITE SPORTS | Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root { --accent: #ff0055; --bg: #050505; --card: #121212; --border: rgba(255,255,255,0.08); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+        .navbar { position: sticky; top: 0; width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-bottom: 1px solid var(--border); }
+        .logo { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 900; color: var(--accent); }
+        .section-container { padding: 30px 20px; }
+        .section-title { font-family: 'Space Grotesk'; font-size: 1.2rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 10px; }
+        .category-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .cat-card { min-width: 160px; height: 160px; background: var(--card); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; cursor: pointer; transition: 0.4s; flex-shrink: 0; }
+        .cat-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
+        .cat-card:hover { border-color: var(--accent); transform: scale(1.05); }
+        .cat-name { position: absolute; bottom: 15px; width: 100%; text-align: center; font-weight: 800; font-size: 0.9rem; }
+        .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .event-card { background: var(--card); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: 0.4s; }
+        .event-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+        .event-info { padding: 15px; }
+        #maint-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div id="maint-screen"><h1>MAINTENANCE MODE</h1></div>
+    <nav class="navbar"><div class="logo">ELITE<span>SPORTS</span></div></nav>
+    <div class="section-container">
+        <h2 class="section-title">Streaming Sources</h2>
+        <div class="category-scroll" id="categoryHub"></div>
+    </div>
+    <div class="section-container">
+        <h2 class="section-title">Manual Picks</h2>
+        <div class="live-grid" id="manualGrid"></div>
+    </div>
+    <script>
+        const config = JSON.parse(localStorage.getItem('elite_config')) || { master: true };
+        const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
+        const manuals = JSON.parse(localStorage.getItem('elite_data')) || [];
+
+        function init() {
+            if(!config.master) { document.getElementById('maint-screen').style.display='flex'; return; }
+            const hub = document.getElementById('categoryHub');
+            for(let cat in sources) {
+                hub.innerHTML += `<div class="cat-card" onclick="location.href='category.html?source=${cat}'">
+                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400">
+                    <div class="cat-name">${cat}</div>
+                </div>`;
+            }
+            const mGrid = document.getElementById('manualGrid');
+            manuals.forEach(m => {
+                mGrid.innerHTML += `<div class="event-card" onclick="location.href='player.html?url=${encodeURIComponent(m.url1)}&title=${encodeURIComponent(m.title)}'">
+                    <img src="${m.thumb}" class="event-thumb">
+                    <div class="event-info"><h3>${m.title}</h3></div>
+                </div>`;
+            });
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
