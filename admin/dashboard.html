@@ -2,64 +2,187 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ELITE ADMIN | SOURCE ENGINE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE ADMIN | Master Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #ff0055; --bg: #050505; --card: #0d0d0d; --border: rgba(255,255,255,0.08); --neon: #00ff41; }
-        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; padding: 20px; }
-        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; max-width: 800px; margin: 0 auto 20px; }
-        h2 { font-size: 0.9rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: #fff; border-radius: 10px; }
-        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-green { background: var(--neon); color: #000; }
-        .list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem; }
+        :root { --accent: #ff0055; --bg: #050505; --card: #0d0d0d; --border: rgba(255,255,255,0.08); --neon: #00ff41; --blue: #00d2ff; }
+        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        body { background: var(--bg); color: white; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        input, select { width: 100%; padding: 14px; margin: 8px 0; background: #111; border: 1px solid #222; color: #fff; border-radius: 12px; outline: none; }
+        input:focus { border-color: var(--accent); }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        
+        /* Specialized Buttons */
+        .btn-maint-on { background: #441111; color: #ff3333; border: 1px solid #ff3333; }
+        .btn-maint-off { background: #114411; color: #33ff33; border: 1px solid #33ff33; }
+        .btn-deploy { background: var(--accent); color: white; }
+        .btn-source { background: var(--blue); color: black; }
+
+        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 900; }
+        .active-pill { background: rgba(0, 255, 65, 0.1); color: var(--neon); }
+        .offline-pill { background: rgba(255, 0, 85, 0.1); color: var(--accent); }
+
+        .item-list { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #080808; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
-    <div class="panel" style="border-color: var(--neon);">
-        <h2>📂 LINK CATEGORY TO JSON SOURCE</h2>
-        <input type="text" id="catName" placeholder="Category Name (e.g., FANCODE)">
-        <input type="text" id="catJson" placeholder="Direct JSON URL (https://...)">
-        <button class="btn btn-green" onclick="mapSource()">Map & Sync Source</button>
+
+<div class="container">
+    <h1 style="text-align:center; font-weight:900; margin-bottom:30px;">ELITE<span>CONTROL</span> CENTER</h1>
+
+    <div class="panel">
+        <h2>🌐 Global System Status</h2>
+        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+            <div id="maintStatus">Status: <span class="status-pill active-pill">ONLINE</span></div>
+        </div>
+        <div class="grid">
+            <button class="btn btn-maint-on" onclick="setMaintenance(true)">Activate Maintenance</button>
+            <button class="btn btn-maint-off" onclick="setMaintenance(false)">Disable Maintenance</button>
+        </div>
+        <input type="text" id="globalAlert" placeholder="Ticker Message (e.g. Join Telegram for updates!)" oninput="saveConfig()">
+    </div>
+
+    <div class="panel" style="border-color: var(--blue);">
+        <h2 style="color: var(--blue);">📂 Category Source Engine</h2>
+        <p style="font-size: 0.7rem; color: #555; margin-bottom: 10px;">Link a Category Name to an External JSON File.</p>
+        <div class="grid">
+            <input type="text" id="catName" placeholder="Category Name (e.g. FANCODE)">
+            <input type="text" id="catJson" placeholder="JSON URL (https://...)">
+        </div>
+        <button class="btn btn-source" onclick="mapCategory()">Sync Category Source</button>
+        <div id="sourceList" class="item-list"></div>
     </div>
 
     <div class="panel">
-        <h2>📊 Active Category Sources</h2>
-        <div id="sourceList"></div>
+        <h2>🚀 Manual Pipeline Deployer</h2>
+        <input type="text" id="title" placeholder="Stream Title">
+        <input type="text" id="thumb" placeholder="Thumbnail URL">
+        <div class="grid">
+            <select id="category">
+                <option value="CRICKET">CRICKET</option>
+                <option value="MOVIES">MOVIES</option>
+                <option value="LIVETV">LIVE TV</option>
+            </select>
+            <select id="aspect">
+                <option value="landscape">Landscape (16:9)</option>
+                <option value="portrait">Portrait (9:16)</option>
+            </select>
+        </div>
+        <div class="grid">
+            <input type="text" id="url1" placeholder="Server 1 URL">
+            <input type="text" id="url2" placeholder="Server 2 URL">
+        </div>
+        <button class="btn btn-deploy" onclick="addManual()">Push to Index</button>
+        <div id="manualList" class="item-list"></div>
     </div>
+</div>
 
-    <script>
-        function mapSource() {
-            const name = document.getElementById('catName').value.toUpperCase().trim();
-            const url = document.getElementById('catJson').value.trim();
-            if(!name || !url) return alert("Fill both fields!");
+<script>
+    // --- Initial Data Load ---
+    let config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "" };
+    let sources = JSON.parse(localStorage.getItem('category_sources')) || {};
+    let streams = JSON.parse(localStorage.getItem('elite_data')) || [];
 
-            let mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
-            mappings[name] = url;
-            localStorage.setItem('category_sources', JSON.stringify(mappings));
-            
-            alert(name + " is now linked!");
-            location.reload();
+    function init() {
+        document.getElementById('globalAlert').value = config.alert;
+        updateMaintUI();
+        renderSources();
+        renderManual();
+    }
+
+    // --- Maintenance Logic ---
+    function setMaintenance(val) {
+        config.master = !val;
+        saveConfig();
+        updateMaintUI();
+        alert(val ? "System is now OFFLINE" : "System is now ONLINE");
+    }
+
+    function updateMaintUI() {
+        const pill = document.querySelector('#maintStatus span');
+        if(config.master) {
+            pill.className = "status-pill active-pill";
+            pill.innerText = "ONLINE";
+        } else {
+            pill.className = "status-pill offline-pill";
+            pill.innerText = "MAINTENANCE MODE";
         }
+    }
 
-        function renderSources() {
-            const list = document.getElementById('sourceList');
-            const mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
-            for (let name in mappings) {
-                list.innerHTML += `<div class="list-item">
-                    <span><b>${name}</b> → ${mappings[name].substring(0,40)}...</span>
-                    <button onclick="removeSource('${name}')" style="background:red; color:white; border:none; border-radius:5px; padding:2px 8px; cursor:pointer;">DEL</button>
-                </div>`;
-            }
-        }
+    function saveConfig() {
+        config.alert = document.getElementById('globalAlert').value;
+        localStorage.setItem('elite_config', JSON.stringify(config));
+    }
 
-        function removeSource(name) {
-            let mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
-            delete mappings[name];
-            localStorage.setItem('category_sources', JSON.stringify(mappings));
-            location.reload();
+    // --- Source Mapping Logic ---
+    function mapCategory() {
+        const name = document.getElementById('catName').value.toUpperCase().trim();
+        const url = document.getElementById('catJson').value.trim();
+        if(!name || !url) return;
+        sources[name] = url;
+        localStorage.setItem('category_sources', JSON.stringify(sources));
+        renderSources();
+    }
+
+    function renderSources() {
+        const list = document.getElementById('sourceList');
+        list.innerHTML = "";
+        for(let key in sources) {
+            list.innerHTML += `<div class="list-row">
+                <span><b>${key}</b></span>
+                <button onclick="removeSource('${key}')" style="background:none; border:none; color:var(--accent); cursor:pointer;">DEL</button>
+            </div>`;
         }
-        window.onload = renderSources;
-    </script>
+    }
+
+    function removeSource(key) {
+        delete sources[key];
+        localStorage.setItem('category_sources', JSON.stringify(sources));
+        renderSources();
+    }
+
+    // --- Manual Stream Logic ---
+    function addManual() {
+        const s = {
+            title: document.getElementById('title').value,
+            thumb: document.getElementById('thumb').value,
+            category: document.getElementById('category').value,
+            aspect: document.getElementById('aspect').value,
+            url1: document.getElementById('url1').value,
+            url2: document.getElementById('url2').value
+        };
+        streams.push(s);
+        localStorage.setItem('elite_data', JSON.stringify(streams));
+        renderManual();
+    }
+
+    function renderManual() {
+        const list = document.getElementById('manualList');
+        list.innerHTML = "";
+        streams.forEach((s, i) => {
+            list.innerHTML += `<div class="list-row">
+                <span>${s.title}</span>
+                <button onclick="removeManual(${i})" style="background:none; border:none; color:var(--accent); cursor:pointer;">DEL</button>
+            </div>`;
+        });
+    }
+
+    function removeManual(i) {
+        streams.splice(i, 1);
+        localStorage.setItem('elite_data', JSON.stringify(streams));
+        renderManual();
+    }
+
+    window.onload = init;
+</script>
 </body>
 </html>
