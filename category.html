@@ -3,142 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | FanCode Style</title>
+    <title>ELITE | FanCode Live</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #00acee; --bg: #0b1622; --card-bg: #152232; --border: #1e2d3e; }
+        :root { --accent: #00acee; --bg: #030a13; --card-bg: #101a26; --border: #1e2d3e; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background: var(--bg); color: white; padding: 20px; }
+        body { background: var(--bg); color: white; padding: 15px; }
 
-        .container { max-width: 600px; margin: 0 auto; }
-        .grid { display: flex; flex-direction: column; gap: 20px; }
-
-        /* --- FanCode Styled Card --- */
-        .fc-card {
+        .container { max-width: 500px; margin: 0 auto; }
+        
+        /* --- FanCode Card Design --- */
+        .match-card {
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
             overflow: hidden;
             border: 1px solid var(--border);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        /* Top Image Part */
-        .fc-banner {
+        .poster-area {
             position: relative;
-            height: 180px;
-            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16/9;
         }
-        .fc-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .poster-area img { width: 100%; height: 100%; object-fit: cover; }
         
-        .live-tag {
-            position: absolute; bottom: 15px; right: 15px;
-            background: #ff0000; color: white; padding: 4px 12px;
-            border-radius: 8px; font-size: 0.7rem; font-weight: 900;
+        .status-badge {
+            position: absolute; bottom: 10px; right: 10px;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 900;
+        }
+        .live { background: #ff0000; color: white; }
+        .upcoming { background: #555; color: white; }
+
+        .event-tag {
+            position: absolute; top: 10px; left: 10px;
+            background: rgba(0,0,0,0.7); padding: 4px 8px;
+            border-radius: 6px; font-size: 0.6rem; color: #00acee;
         }
 
-        .category-tag {
-            position: absolute; top: 15px; left: 15px;
-            background: rgba(0,0,0,0.6); padding: 4px 10px;
-            border-radius: 8px; font-size: 0.6rem; display: flex; align-items: center; gap: 5px;
-        }
-
-        /* Bottom Info Part */
-        .fc-info { padding: 20px; text-align: center; }
+        /* Match Info Section */
+        .match-info { padding: 15px; text-align: center; }
         
-        .match-teams {
-            display: flex; justify-content: space-around; align-items: center;
-            margin-bottom: 20px;
-        }
-        .team { text-align: center; }
-        .team img { width: 50px; height: 50px; border-radius: 50%; background: #000; padding: 5px; margin-bottom: 8px; }
-        .team span { display: block; font-weight: 800; font-size: 0.9rem; }
+        .event-name { font-size: 0.7rem; color: #8899a6; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .vs-text { font-weight: 900; color: var(--accent); font-size: 1.2rem; }
-        .match-time { font-size: 0.75rem; color: #8899a6; margin-top: 5px; }
+        .teams-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin: 10px 0; padding: 0 10px;
+        }
+        .team-box { flex: 1; text-align: center; }
+        .team-box span { display: block; font-weight: 700; font-size: 0.85rem; margin-top: 5px; }
+        
+        .vs-circle { 
+            width: 30px; height: 30px; background: #1e2d3e; 
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; font-size: 0.7rem; font-weight: 900; color: var(--accent);
+        }
+
+        .match-time { font-size: 0.7rem; color: #00acee; margin-bottom: 15px; font-weight: 600; }
 
         /* Watch Button */
-        .btn-watch {
-            width: 100%;
-            background: var(--accent);
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 900;
-            font-size: 1rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
+        .watch-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; background: var(--accent); color: white;
+            text-decoration: none; padding: 12px; border-radius: 50px;
+            font-weight: 900; font-size: 0.9rem; transition: 0.3s;
         }
-        .btn-watch:hover { background: #008fcc; transform: scale(0.98); }
-
-        .btn-watch svg { width: 20px; fill: white; }
-
+        .watch-btn:hover { background: #008fcc; transform: scale(0.97); }
+        
+        .loader { text-align: center; margin-top: 50px; color: #555; font-weight: 900; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2 style="margin-bottom: 20px; font-size: 1.5rem;">Live & Upcoming</h2>
-        <div class="grid" id="dataGrid">
-            </div>
+        <div id="loader" class="loader">FETCHING FANCODE SIGNALS...</div>
+        <div id="grid"></div>
     </div>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const sourceName = params.get('source') || "FANCODE";
+        const url = "https://raw.githubusercontent.com/drmlive/fancode-live-events/refs/heads/main/fancode.json";
 
-        async function loadData() {
-            const grid = document.getElementById('dataGrid');
-            const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
-            const jsonUrl = sources[sourceName.toUpperCase()];
-
-            if (!jsonUrl) {
-                grid.innerHTML = "No JSON URL found in Admin for this category.";
-                return;
-            }
-
+        async function fetchMatches() {
             try {
-                const response = await fetch(jsonUrl);
+                const response = await fetch(url);
                 const data = await response.json();
-                
-                grid.innerHTML = "";
-                data.forEach(item => {
+                const grid = document.getElementById('grid');
+                document.getElementById('loader').style.display = 'none';
+
+                // NOTE: Using data.matches because your JSON has a "matches" key
+                data.matches.forEach(match => {
+                    const isLive = match.status === "LIVE";
+                    
                     grid.innerHTML += `
-                        <div class="fc-card">
-                            <div class="fc-banner">
-                                <img src="${item.thumb}" alt="Match Poster">
-                                <div class="category-tag">🏏 Cricket</div>
-                                <div class="live-tag">LIVE</div>
+                        <div class="match-card">
+                            <div class="poster-area">
+                                <img src="${match.src}" alt="Poster">
+                                <div class="event-tag">${match.event_category}</div>
+                                <div class="status-badge ${isLive ? 'live' : 'upcoming'}">${match.status}</div>
                             </div>
-                            <div class="fc-info">
-                                <div class="match-teams">
-                                    <div class="team">
-                                        <img src="${item.team1_logo || 'https://via.placeholder.com/50'}" alt="T1">
-                                        <span>${item.team1 || 'TEAM A'}</span>
+                            <div class="match-info">
+                                <div class="event-name">${match.event_name}</div>
+                                <div class="teams-row">
+                                    <div class="team-box">
+                                        <span style="color:#fff">${match.team_1}</span>
                                     </div>
-                                    <div class="vs-text">VS</div>
-                                    <div class="team">
-                                        <img src="${item.team2_logo || 'https://via.placeholder.com/50'}" alt="T2">
-                                        <span>${item.team2 || 'TEAM B'}</span>
+                                    <div class="vs-circle">VS</div>
+                                    <div class="team-box">
+                                        <span style="color:#fff">${match.team_2}</span>
                                     </div>
                                 </div>
-                                <div class="match-time">🕒 ${item.date || 'Today, 07:30 PM'}</div>
-                                <br>
-                                <a href="player.html?url=${encodeURIComponent(item.url1)}&title=${encodeURIComponent(item.title)}" class="btn-watch">
-                                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                    Watch Live
+                                <div class="match-time">🕒 ${match.startTime}</div>
+                                <a href="player.html?id=${match.match_id}" class="watch-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                                    WATCH LIVE
                                 </a>
                             </div>
-                        </div>`;
+                        </div>
+                    `;
                 });
-            } catch (error) {
-                grid.innerHTML = "Failed to load JSON data.";
+            } catch (e) {
+                document.getElementById('loader').innerText = "FAILED TO LOAD DATA";
             }
         }
 
-        window.onload = loadData;
+        window.onload = fetchMatches;
     </script>
 </body>
 </html>
