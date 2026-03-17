@@ -10,128 +10,73 @@
 
     <style>
         :root {
-            --accent: #ff0055;
-            --bg: #030303;
-            --card: rgba(20, 20, 20, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
-            --neon-blue: #00d2ff;
+            --accent: #ff0055; --bg: #000; --card: #0d0d0d;
+            --border: rgba(255, 255, 255, 0.05);
         }
-
-        /* Tactical Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
 
-        /* Maintenance Overlay */
+        /* Maintenance Screen */
         #maint-screen {
             position: fixed; inset: 0; background: #000; z-index: 9999;
             display: none; flex-direction: column; align-items: center; justify-content: center;
+            font-family: 'Space Grotesk'; text-align: center;
         }
 
-        /* Navbar - Ultra Glass */
+        /* Navbar */
         .nav-container {
-            position: sticky; top: 0; width: 100%; padding: 15px 25px;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(25px);
+            position: sticky; top: 0; width: 100%; padding: 18px 25px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
             display: flex; justify-content: space-between; align-items: center;
             z-index: 1000; border-bottom: 1px solid var(--border);
         }
-        .logo { font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 900; text-transform: uppercase; }
-        .logo span { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        .logo { font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 900; }
+        .logo span { color: var(--accent); }
 
-        /* Live Status Ticker */
-        .ticker-bar { 
-            background: linear-gradient(90deg, var(--accent), #990033); 
-            color: white; padding: 6px; font-size: 0.65rem; font-weight: 900; 
-            text-align: center; letter-spacing: 1px;
-        }
+        /* Ticker Bar */
+        .ticker-bar { background: var(--accent); color: white; padding: 6px; font-size: 0.7rem; font-weight: 900; text-align: center; overflow: hidden; letter-spacing: 1px; }
 
         /* Bento Grid */
-        .bento-grid { 
-            padding: 20px; display: grid; grid-template-columns: 1fr; gap: 18px; 
-            max-width: 1300px; margin: 0 auto; 
-        }
+        .bento-grid { padding: 20px; display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 1200px; margin: 0 auto; }
         
         @media (min-width: 768px) {
-            .bento-grid { grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(200px, auto); }
-            .hero { grid-column: span 2; grid-row: span 2; height: 100%; }
+            .bento-grid { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 220px; }
+            .hero { grid-column: span 2; grid-row: span 2; }
             .portrait { grid-row: span 2; }
         }
 
-        /* Premium Card Design */
         .card-unit {
-            background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+            background: var(--card); border: 1px solid var(--border); border-radius: 28px;
             position: relative; overflow: hidden; display: flex; flex-direction: column;
-            justify-content: flex-end; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-            cursor: pointer; min-height: 220px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            justify-content: flex-end; transition: 0.4s; cursor: pointer; min-height: 200px;
         }
 
-        /* Hero Glow Effect */
-        .hero { border: 1px solid var(--accent); box-shadow: 0 0 20px rgba(255, 0, 85, 0.2); }
+        .card-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; transition: 0.5s; }
+        .card-unit:hover .card-bg { opacity: 0.6; transform: scale(1.05); }
 
-        .card-bg { 
-            position: absolute; inset: 0; width: 100%; height: 100%; 
-            object-fit: cover; opacity: 0.5; transition: 0.6s; 
-        }
-        
-        .card-unit:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.2); }
-        .card-unit:hover .card-bg { transform: scale(1.08); opacity: 0.8; }
+        .card-content { position: relative; z-index: 2; padding: 20px; background: linear-gradient(0deg, rgba(0,0,0,0.8), transparent); }
+        .badge { position: absolute; top: 15px; left: 15px; background: var(--accent); padding: 4px 10px; border-radius: 10px; font-size: 0.6rem; font-weight: 900; z-index: 3; }
+        .title { font-family: 'Space Grotesk'; font-size: 1.2rem; text-transform: uppercase; }
 
-        .card-content { 
-            position: relative; z-index: 2; padding: 25px; 
-            background: linear-gradient(0deg, rgba(0,0,0,1) 10%, transparent 100%); 
-        }
-        
-        .badge { 
-            position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px); color: var(--accent); padding: 5px 12px; 
-            border-radius: 12px; font-size: 0.6rem; font-weight: 900; z-index: 3;
-            border: 1px solid var(--accent);
-        }
-
-        .title { 
-            font-family: 'Space Grotesk'; font-size: 1.3rem; line-height: 1.1; 
-            margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .cat-label { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Shimmer */
+        /* Shimmer Loading */
         .shimmer { background: #111; position: relative; overflow: hidden; }
-        .shimmer::after { 
-            content: ""; position: absolute; inset: 0; 
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); 
-            animation: shim 1.5s infinite; 
-        }
+        .shimmer::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shim 1.5s infinite; }
         @keyframes shim { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-        /* Floating Button */
-        .fab {
-            position: fixed; bottom: 25px; right: 25px; width: 50px; height: 50px;
-            background: var(--accent); border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; font-size: 1.2rem;
-            box-shadow: 0 5px 20px var(--accent); z-index: 1000; cursor: pointer;
-        }
-
     </style>
 </head>
 <body>
 
     <div id="maint-screen">
-        <h1 style="color:var(--accent); font-family:'Space Grotesk'; font-size: 2rem;">SERVER OFFLINE</h1>
-        <p style="color:#555; margin-top: 10px;">MAINTENANCE IN PROGRESS</p>
+        <h1 style="color:var(--accent);">UNDER MAINTENANCE</h1>
+        <p style="color:#555; margin-top:10px;">Check back later.</p>
     </div>
 
-    <div class="ticker-bar" id="ticker">INITIALIZING SECURE BROADCAST...</div>
+    <div class="ticker-bar" id="ticker">CONNECTING TO SECURE PIPELINE...</div>
 
     <nav class="nav-container">
         <div class="logo">ELITE<span>STREAM</span></div>
-        <div id="live-dot" style="display:flex; align-items:center; gap:8px;">
-            <div style="width:8px; height:8px; background:var(--accent); border-radius:50%; animation: pulse 1s infinite;"></div>
-            <span style="font-size:0.6rem; font-weight:900; letter-spacing:1px;">LIVE CONSOLE</span>
-        </div>
+        <div style="font-size:0.6rem; color:#444; font-weight:900;">V13.5 STABLE</div>
     </nav>
 
     <main class="bento-grid" id="mainGrid">
@@ -140,37 +85,45 @@
         <div class="card-unit shimmer"></div>
     </main>
 
-    <div class="fab" onclick="window.open('https://t.me/yourchannel')">✈️</div>
-
     <script>
-        const config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "System Online" };
-        const manualStreams = JSON.parse(localStorage.getItem('elite_data')) || [];
-        const jsonSources = JSON.parse(localStorage.getItem('category_sources')) || {};
+        // Load configurations
+        const config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "System Live" };
+        const manualData = JSON.parse(localStorage.getItem('elite_data')) || [];
+        const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
 
-        async function initApp() {
+        async function init() {
+            // 1. Check Maintenance
             if(!config.master) {
                 document.getElementById('maint-screen').style.display = 'flex';
                 return;
             }
-            document.getElementById('ticker').innerText = config.alert;
-            
-            let allData = [...manualStreams];
 
-            for (let cat in jsonSources) {
+            // 2. Set Ticker
+            document.getElementById('ticker').innerText = config.alert;
+
+            // 3. Compile Data
+            let combinedData = [...manualData];
+
+            for (let cat in sources) {
                 try {
-                    const res = await fetch(jsonSources[cat]);
-                    const data = await res.json();
-                    const taggedData = data.map(item => ({ ...item, category: cat }));
-                    allData = [...allData, ...taggedData];
-                } catch (e) { console.error("Source Error", cat); }
+                    const res = await fetch(sources[cat]);
+                    const json = await res.json();
+                    const tagged = json.map(item => ({ ...item, category: cat }));
+                    combinedData = [...combinedData, ...tagged];
+                } catch (e) { console.warn("Failed to fetch source: " + cat); }
             }
 
-            renderGrid(allData);
+            render(combinedData);
         }
 
-        function renderGrid(data) {
+        function render(data) {
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = "";
+
+            if(data.length === 0) {
+                grid.innerHTML = `<p style="text-align:center; grid-column:span 4; padding:50px; color:#333;">No active signals.</p>`;
+                return;
+            }
 
             data.forEach((s, i) => {
                 let cls = "card-unit";
@@ -178,21 +131,20 @@
                 if(s.aspect === 'portrait') cls += " portrait";
 
                 grid.innerHTML += `
-                    <div class="${cls}" onclick="location.href='player.html?url=${encodeURIComponent(s.url1 || s.url)}&title=${encodeURIComponent(s.title)}'">
+                    <div class="${cls}" onclick="location.href='player.html?id=${i}'">
                         <img src="${s.thumb}" class="card-bg">
                         <div class="badge">${s.category || 'LIVE'}</div>
                         <div class="card-content">
-                            <p class="cat-label">SIGNAL STABLE</p>
                             <h2 class="title">${s.title}</h2>
                         </div>
                     </div>`;
             });
-            gsap.from(".card-unit", { opacity: 0, scale: 0.95, y: 30, stagger: 0.1, duration: 1, ease: "power4.out" });
+
+            // Smooth entrance animation
+            gsap.from(".card-unit", { opacity: 0, y: 20, stagger: 0.1, duration: 0.8, ease: "power2.out" });
         }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-
-        window.onload = initApp;
+        window.onload = init;
     </script>
 </body>
 </html>
