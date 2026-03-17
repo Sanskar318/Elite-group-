@@ -3,56 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | M3U Signals</title>
+    <title>ELITE | Sony Pipeline</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background: #02040a; color: white; font-family: 'Outfit', sans-serif; }
-        .m3u-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .m3u-card:hover { border-color: #0ea5e9; transform: scale(1.02); }
+        .sony-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .sony-card:hover { border-color: #ff0055; transform: scale(1.02); }
     </style>
 </head>
 <body class="p-4">
     <div class="max-w-xl mx-auto">
-        <h1 class="text-xl font-black uppercase text-sky-500 mb-6 tracking-tighter">M3U Pipeline</h1>
-        <div id="matchGrid" class="space-y-4"></div>
+        <header class="flex justify-between items-center mb-6">
+            <h1 id="displayTitle" class="text-xl font-black uppercase text-pink-500 tracking-tighter">SOURCE</h1>
+            <a href="index.html" class="text-xs font-bold bg-white/5 px-4 py-2 rounded-full border border-white/10">HOME</a>
+        </header>
+
+        <div id="matchGrid" class="grid grid-cols-2 gap-4"></div>
     </div>
 
     <script>
-        const M3U_URL = 'https://raw.githubusercontent.com/jitendra-unatti/fancode/refs/heads/main/data/fancode.m3u';
+        const params = new URLSearchParams(window.location.search);
+        const sourceName = params.get('source') || "SONY";
+        document.getElementById('displayTitle').innerText = sourceName;
 
-        async function parseM3U() {
+        async function parseSonyM3U() {
+            const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
+            const M3U_URL = sources[sourceName.toUpperCase()];
+            const grid = document.getElementById('matchGrid');
+
+            if(!M3U_URL) return;
+
             try {
                 const res = await fetch(M3U_URL);
                 const data = await res.text();
-                const grid = document.getElementById('matchGrid');
                 const lines = data.split('\n');
                 
-                let currentItem = {};
-
+                let cur = {};
                 lines.forEach(line => {
                     if (line.startsWith('#EXTINF:')) {
                         const logoMatch = line.match(/tvg-logo="([^"]+)"/);
-                        currentItem.thumb = logoMatch ? logoMatch[1] : '';
-                        currentItem.title = line.split(',')[1] || "Live Match";
+                        cur.thumb = logoMatch ? logoMatch[1] : '';
+                        cur.title = line.split(',')[1] || "Sony Channel";
                     } else if (line.startsWith('http')) {
-                        const streamLink = line.trim();
+                        const stream = line.trim();
                         grid.innerHTML += `
-                        <div class="m3u-card rounded-3xl overflow-hidden p-4 flex items-center gap-4 cursor-pointer" 
-                             onclick="location.href='player.html?url=${encodeURIComponent(streamLink)}&title=${encodeURIComponent(currentItem.title)}'">
-                            <img src="${currentItem.thumb}" class="w-16 h-16 rounded-xl object-cover bg-black">
-                            <div class="flex-1">
-                                <div class="text-[10px] text-sky-500 font-bold uppercase tracking-widest">Live Stream</div>
-                                <div class="font-bold text-sm">${currentItem.title}</div>
-                            </div>
-                            <div class="bg-sky-500/20 text-sky-400 p-2 rounded-full"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+                        <div class="sony-card rounded-2xl overflow-hidden p-3 cursor-pointer text-center" 
+                             onclick="location.href='player.html?url=${encodeURIComponent(stream)}&title=${encodeURIComponent(cur.title)}'">
+                            <img src="${cur.thumb}" class="w-full aspect-square rounded-xl object-contain bg-black mb-3 p-2">
+                            <div class="font-bold text-[11px] truncate uppercase">${cur.title}</div>
                         </div>`;
-                        currentItem = {};
+                        cur = {};
                     }
                 });
-            } catch (err) { console.error("M3U Fetch Error"); }
+            } catch (e) { console.error("M3U Error"); }
         }
-        window.onload = parseM3U;
+        window.onload = parseSonyM3U;
     </script>
 </body>
 </html>
