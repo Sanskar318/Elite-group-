@@ -74,5 +74,16 @@
                 grid.innerHTML += `
                 <div class="ch-card rounded-2xl overflow-hidden p-3" onclick="openPlayer('${encodeURIComponent(ch.link || ch.iframeSrc)}', '${encodeURIComponent(ch.name)}')">
                     <img src="${ch.logo}" class="w-full aspect-square object-contain bg-black rounded-xl mb-3 p-2">
-                    <div class="text-[11px] font-bold text-center truncate uppercase tracking-tight">${ch.name}
-        
+                    <div class="text-[11px] font-bold text-center truncate uppercase tracking-tight">${ch.name}</div>
+                </div>`;
+            });
+        }
+
+        function openPlayer(link, name) {
+            window.location.href = `player.html?url=${link}&title=${name}`;
+        }
+
+        window.onload = loadAllChannels;
+    </script>
+</body>
+</html>
