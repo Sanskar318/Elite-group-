@@ -3,64 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tushar Stream | JSON Home</title>
+    <title>Tushar Stream | Fast Load</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0b0f14; font-family: 'Poppins', sans-serif; color: white; }
-        .ch-card { background: #161b22; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; cursor: pointer; }
-        .ch-card:hover { border-color: #00ffcc; transform: translateY(-3px); box-shadow: 0 10px 20px -10px #00ffcc33; }
+        body { background: #0b0f14; font-family: sans-serif; color: white; }
+        .ch-card { background: #161b22; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; cursor: pointer; }
+        .ch-card:hover { border-color: #00ffcc; transform: scale(1.02); }
     </style>
 </head>
 <body class="p-4">
-    <div class="max-w-4xl mx-auto flex justify-between items-center mb-8 p-5 bg-slate-900/80 rounded-3xl border border-white/5">
-        <h1 class="text-xl font-bold tracking-tighter uppercase">Tushar <span class="text-sky-400">Stream</span></h1>
-        <div class="flex items-center gap-2 bg-sky-500/10 text-sky-400 px-3 py-1 rounded-full text-[10px] font-black border border-sky-500/20">
-            JSON ENGINE v1.0
-        </div>
+
+    <div class="max-w-4xl mx-auto flex justify-between items-center mb-6 p-4 bg-slate-900/80 rounded-2xl border border-white/5">
+        <h1 class="text-lg font-bold text-sky-400 uppercase">Tushar Stream</h1>
+        <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded-full border border-green-500/30">FAST-SYNC ON</span>
     </div>
 
-    <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="channelGrid">
-        <div class="col-span-full text-center py-20 text-slate-500 text-sm animate-pulse">
-            Fetching Channels...
+    <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4" id="channelGrid">
+        <div id="loader" class="col-span-full text-center py-20">
+            <div class="inline-block w-8 h-8 border-4 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-4 text-slate-500 text-sm italic">Connecting to Pipeline...</p>
         </div>
     </div>
 
     <script>
-        // Sirf aapka JSON link
-        const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json';
+        // 1. URL ke peeche Timestamp joda hai taaki har baar fresh data aaye
+        const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json?t=' + Date.now();
 
-        async function loadChannels() {
+        async function fetchData() {
             const grid = document.getElementById('channelGrid');
+            const loader = document.getElementById('loader');
+
             try {
-                const response = await fetch(JSON_URL);
-                const data = await response.json();
-
-                grid.innerHTML = ''; // Clear loader
-
-                data.forEach(ch => {
-                    // JSON fields check: ch.link ya ch.iframeSrc
-                    const finalLink = ch.link || ch.iframeSrc;
-                    
-                    grid.innerHTML += `
-                    <div class="ch-card rounded-2xl overflow-hidden p-3" onclick="openPlayer('${encodeURIComponent(finalLink)}', '${encodeURIComponent(ch.name)}')">
-                        <img src="${ch.logo}" class="w-full aspect-square object-contain bg-black rounded-xl mb-3 p-2" onerror="this.src='https://via.placeholder.com/150?text=No+Logo'">
-                        <div class="text-[11px] font-bold text-center truncate uppercase tracking-tight">${ch.name}</div>
-                    </div>`;
+                // 2. Fetch with no-cache headers
+                const response = await fetch(JSON_URL, {
+                    method: 'GET',
+                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
                 });
 
+                if (!response.ok) throw new Error("Server Response Error");
+
+                const data = await response.json();
+                
+                // 3. Sabhi types ke JSON format ko support karne ke liye check
+                const channels = Array.isArray(data) ? data : (data.channels || data.iframes || data.data || []);
+
+                if (channels.length === 0) {
+                    loader.innerHTML = "No Channels Found!";
+                    return;
+                }
+
+                loader.remove(); // Remove spinner immediately
+
+                // 4. Fast Rendering
+                let html = '';
+                channels.forEach(ch => {
+                    const link = ch.link || ch.iframeSrc || ch.url;
+                    const logo = ch.logo || ch.image || 'https://via.placeholder.com/150?text=TV';
+                    const name = ch.name || "Live Channel";
+
+                    html += `
+                    <div class="ch-card rounded-2xl overflow-hidden p-3" onclick="location.href='player.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(name)}'">
+                        <img src="${logo}" class="w-full aspect-square object-contain bg-black rounded-xl mb-3 p-2" loading="lazy">
+                        <div class="text-[11px] font-bold text-center truncate uppercase">${name}</div>
+                    </div>`;
+                });
+                grid.innerHTML = html;
+
             } catch (err) {
-                grid.innerHTML = "<p class='col-span-full text-center text-red-400 font-bold'>Failed to load JSON data.</p>";
-                console.error(err);
+                loader.innerHTML = `<p class="text-red-500 font-bold">Error: ${err.message}<br><span class="text-xs text-slate-500">Check if JSON is Public</span></p>`;
             }
         }
 
-        function openPlayer(link, name) {
-            // Player page par data bhej raha hai
-            window.location.href = `player.html?url=${link}&title=${name}`;
-        }
-
-        window.onload = loadChannels;
+        // Fast load on DOM ready
+        document.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 </html>
