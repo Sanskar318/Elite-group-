@@ -1,177 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE ADMIN | Universal Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8"><title>ELITE ADMIN</title>
     <style>
-        :root { --accent: #ff0055; --bg: #050505; --card: #0d0d0d; --border: rgba(255,255,255,0.08); --blue: #00acee; }
-        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.3s; }
-        body { background: var(--bg); color: white; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        
-        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        
-        input, select { width: 100%; padding: 14px; margin: 8px 0; background: #111; border: 1px solid #222; color: #fff; border-radius: 12px; outline: none; }
-        input:focus { border-color: var(--accent); }
-
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        
-        .btn-maint { background: #222; color: #fff; border: 1px solid #444; }
-        .btn-maint.active { background: #441111; color: #ff3333; border-color: #ff3333; }
-        .btn-save { background: var(--accent); color: white; }
-        .btn-source { background: var(--blue); color: #000; }
-
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #000; border-radius: 12px; margin-top: 10px; border: 1px solid var(--border); }
-        .badge { font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-weight: 900; margin-left: 10px; }
-        .tag-m3u { background: #00ff41; color: #000; }
-        .tag-json { background: var(--blue); color: #000; }
+        body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
+        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; }
+        button { width: 100%; padding: 10px; background: #ff0055; color: white; border: none; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1 style="text-align:center; font-weight:900; margin-bottom:30px;">ELITE<span> COMMAND</span> V17</h1>
-
-    <div class="panel">
-        <h2>🌐 System Status & Ticker</h2>
-        <div class="grid">
-            <button id="maintBtn" class="btn btn-maint" onclick="toggleMaint()">Maintenance: OFF</button>
-            <input type="text" id="tickerMsg" placeholder="Global Announcement Message..." oninput="updateConfig()">
-        </div>
+    <div class="card">
+        <h2>Maintenance</h2>
+        <button onclick="toggleM()">ON/OFF Site</button>
     </div>
-
-    <div class="panel" style="border-color: var(--blue);">
-        <h2 style="color: var(--blue);">📂 Universal Source Manager</h2>
-        <p style="font-size: 0.7rem; color: #666; margin-bottom: 10px;">Link your FanCode JSON, SonyLiv JSON, or IPTV M3U Playlist here.</p>
-        <div class="grid">
-            <input type="text" id="srcName" placeholder="Category Name (e.g. FANCODE)">
-            <input type="text" id="srcUrl" placeholder="Link (Direct JSON or .m3u URL)">
-        </div>
-        <button class="btn btn-source" onclick="addSource()">Sync Universal Source</button>
-        
-        <div id="sourceList" style="margin-top:20px;">
-            </div>
+    <div class="card">
+        <h2>Source (JSON/M3U)</h2>
+        <input id="sn" placeholder="Category Name">
+        <input id="su" placeholder="URL">
+        <button onclick="saveS()">Sync Source</button>
     </div>
-
-    <div class="panel">
-        <h2>🚀 Manual Pipeline</h2>
-        <input type="text" id="manTitle" placeholder="Match Title">
-        <input type="text" id="manThumb" placeholder="Thumbnail Image URL">
-        <input type="text" id="manUrl" placeholder="Direct Stream Link (m3u8/mp4)">
-        <button class="btn btn-save" onclick="addManual()">Deploy Manual Signal</button>
-        <div id="manualList" style="margin-top:20px;"></div>
+    <div class="card">
+        <h2>Manual Signal</h2>
+        <input id="mt" placeholder="Title"><input id="mi" placeholder="Image"><input id="mu" placeholder="Stream URL">
+        <button onclick="saveM()">Deploy</button>
     </div>
-</div>
-
-<script>
-    // Data Storage
-    let config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "System Live" };
-    let sources = JSON.parse(localStorage.getItem('category_sources')) || {};
-    let manuals = JSON.parse(localStorage.getItem('elite_data')) || [];
-
-    function init() {
-        document.getElementById('tickerMsg').value = config.alert;
-        updateMaintUI();
-        renderSources();
-        renderManuals();
-    }
-
-    // Maintenance Logic
-    function toggleMaint() {
-        config.master = !config.master;
-        saveAll();
-        updateMaintUI();
-    }
-
-    function updateMaintUI() {
-        const btn = document.getElementById('maintBtn');
-        if(!config.master) {
-            btn.innerText = "Maintenance: ON";
-            btn.classList.add('active');
-        } else {
-            btn.innerText = "Maintenance: OFF";
-            btn.classList.remove('active');
+    <script>
+        function toggleM() {
+            let c = JSON.parse(localStorage.getItem('elite_config')) || {master:true};
+            c.master = !c.master;
+            localStorage.setItem('elite_config', JSON.stringify(c));
+            alert("Maintenance: " + (c.master ? "OFF" : "ON"));
         }
-    }
-
-    function updateConfig() {
-        config.alert = document.getElementById('tickerMsg').value;
-        saveAll();
-    }
-
-    // Source Logic (JSON/M3U)
-    function addSource() {
-        const name = document.getElementById('srcName').value.toUpperCase().trim();
-        const url = document.getElementById('srcUrl').value.trim();
-        if(!name || !url) return;
-
-        sources[name] = url;
-        saveAll();
-        renderSources();
-        document.getElementById('srcName').value = "";
-        document.getElementById('srcUrl').value = "";
-    }
-
-    function renderSources() {
-        const div = document.getElementById('sourceList');
-        div.innerHTML = "";
-        for (let key in sources) {
-            const isM3U = sources[key].toLowerCase().includes('.m3u');
-            div.innerHTML += `
-                <div class="list-item">
-                    <span><b>${key}</b> <span class="badge ${isM3U?'tag-m3u':'tag-json'}">${isM3U?'M3U':'JSON'}</span></span>
-                    <button onclick="deleteSource('${key}')" style="background:none; border:none; color:var(--accent); cursor:pointer; font-weight:900;">DEL</button>
-                </div>`;
+        function saveS() {
+            let s = JSON.parse(localStorage.getItem('category_sources')) || {};
+            s[document.getElementById('sn').value.toUpperCase()] = document.getElementById('su').value;
+            localStorage.setItem('category_sources', JSON.stringify(s));
+            alert("Source Saved");
         }
-    }
-
-    function deleteSource(key) {
-        delete sources[key];
-        saveAll();
-        renderSources();
-    }
-
-    // Manual Signal Logic
-    function addManual() {
-        const data = {
-            title: document.getElementById('manTitle').value,
-            thumb: document.getElementById('manThumb').value,
-            url1: document.getElementById('manUrl').value
-        };
-        manuals.push(data);
-        saveAll();
-        renderManuals();
-    }
-
-    function renderManuals() {
-        const div = document.getElementById('manualList');
-        div.innerHTML = "";
-        manuals.forEach((m, i) => {
-            div.innerHTML += `
-                <div class="list-item">
-                    <span>${m.title}</span>
-                    <button onclick="deleteManual(${i})" style="background:none; border:none; color:var(--accent); cursor:pointer; font-weight:900;">DEL</button>
-                </div>`;
-        });
-    }
-
-    function deleteManual(i) {
-        manuals.splice(i, 1);
-        saveAll();
-        renderManuals();
-    }
-
-    function saveAll() {
-        localStorage.setItem('elite_config', JSON.stringify(config));
-        localStorage.setItem('category_sources', JSON.stringify(sources));
-        localStorage.setItem('elite_data', JSON.stringify(manuals));
-    }
-
-    window.onload = init;
-</script>
+        function saveM() {
+            let d = JSON.parse(localStorage.getItem('elite_data')) || [];
+            d.push({title:document.getElementById('mt').value, thumb:document.getElementById('mi').value, url1:document.getElementById('mu').value});
+            localStorage.setItem('elite_data', JSON.stringify(d));
+            alert("Signal Deployed");
+        }
+    </script>
 </body>
 </html>
