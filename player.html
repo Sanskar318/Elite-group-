@@ -2,50 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ELITE PLAYER</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ELITE PLAYER | FanCode Engine</title>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <style>
-        :root { --plyr-color-main: #ff0055; }
-        body { background: #000; height: 100vh; display: flex; flex-direction: column; }
-        .player-main { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        :root { --plyr-color-main: #0ea5e9; }
+        body { background: #000; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .player-main { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; object-fit: contain; }
+        .loader { position: absolute; inset: 0; background: #000; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 45px; height: 45px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #0ea5e9; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="text-white">
-    <header class="p-4 bg-slate-900 border-b border-slate-800">
-        <h1 id="match-title" class="text-xl font-black">Loading...</h1>
+
+    <header class="p-4 bg-slate-900/80 backdrop-blur-lg border-b border-white/10 flex justify-between items-center">
+        <h1 id="match-title" class="text-lg font-bold truncate">Establishing Signal...</h1>
+        <div class="px-2 py-1 bg-red-600 rounded text-[10px] font-black uppercase">Live HDR</div>
     </header>
+
     <main class="player-main">
-        <video id="player" playsinline controls></video>
+        <div id="loader" class="loader">
+            <div class="spinner mb-4"></div>
+            <p class="text-xs text-slate-500 font-mono tracking-widest uppercase">Authenticating Token...</p>
+        </div>
+        <video id="player" playsinline controls crossorigin="anonymous"></video>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const streamUrl = params.get('url');
-        const title = params.get('title');
+        const API_URL = 'https://raw.githubusercontent.com/Jitendra-unatti/fancode/refs/heads/main/data/fancode.json';
         const video = document.getElementById('player');
+        const loader = document.getElementById('loader');
 
-        document.getElementById('match-title').textContent = title;
+        async function startEngine() {
+            const params = new URLSearchParams(window.location.search);
+            const matchId = params.get('id');
 
-        if (Hls.isSupported()) {
-            const hls = new Hls({
-                xhrSetup: function (xhr) {
-                    xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Linux; Android 10; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36');
-                    xhr.setRequestHeader('Referer', 'https://www.sonyliv.com/');
+            if (!matchId) {
+                loader.innerHTML = `<p class="text-red-500">ERROR: NO MATCH ID PROVIDED</p>`;
+                return;
+            }
+
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                
+                // Finding match by ID
+                const match = data.matches.find(m => String(m.match_id) === String(matchId));
+
+                if (!match || !match.auto_streams || match.auto_streams.length === 0) {
+                    throw new Error("Match data or auto_streams missing.");
                 }
-            });
-            hls.loadSource(streamUrl);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                const player = new Plyr(video, { autoplay: true });
-                player.play();
-            });
-        } else {
-            video.src = streamUrl;
-            new Plyr(video, { autoplay: true }).play();
+
+                document.getElementById('match-title').textContent = match.title;
+                
+                // Extracting manifest content and cookie
+                const manifestText = match.auto_streams[0].auto;
+                const akamaiCookie = match.auto_streams[0].cookie;
+
+                // Create a virtual file (Blob) from the manifest text
+                const blob = new Blob([manifestText], { type: 'application/x-mpegURL' });
+                const manifestBlobUrl = URL.createObjectURL(blob);
+
+                if (Hls.isSupported()) {
+                    const hls = new Hls({
+                        xhrSetup: function (xhr, url) {
+                            xhr.withCredentials = false;
+                            // Injecting headers for Akamai bypass
+                            xhr.setRequestHeader('Cookie', akamaiCookie);
+                            xhr.setRequestHeader('User-Agent', 'ReactNativeVideo/9.3.0 (Linux;Android 13) AndroidXMedia3/1.6.1');
+                            xhr.setRequestHeader('Referer', 'https://fancode.com/');
+                        }
+                    });
+
+                    hls.loadSource(manifestBlobUrl);
+                    hls.attachMedia(video);
+                    
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        loader.style.display = 'none';
+                        new Plyr(video, {
+                            quality: { default: 720, options: [1080, 720, 480, 360] }
+                        });
+                        video.play().catch(e => console.log("Play blocked by browser."));
+                    });
+
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        if (data.fatal) {
+                            loader.innerHTML = `<p class="text-red-500">TOKEN EXPIRED. UPDATE JSON SOURCE.</p>`;
+                            hls.destroy();
+                        }
+                    });
+                } else {
+                    // Fallback for Safari/iOS
+                    video.src = manifestBlobUrl;
+                    loader.style.display = 'none';
+                    new Plyr(video).play();
+                }
+
+            } catch (err) {
+                loader.innerHTML = `<p class="text-red-500">${err.message}</p>`;
+            }
         }
+
+        window.onload = startEngine;
     </script>
 </body>
 </html>
