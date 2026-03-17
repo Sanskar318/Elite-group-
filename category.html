@@ -3,94 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE | Signals</title>
+    <title>ELITE | M3U Signals</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background: #02040a; font-family: 'Inter', sans-serif; color: white; }
-        .match-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.05); }
+        body { background: #02040a; color: white; font-family: 'Outfit', sans-serif; }
+        .m3u-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .m3u-card:hover { border-color: #0ea5e9; transform: scale(1.02); }
     </style>
 </head>
 <body class="p-4">
-
     <div class="max-w-xl mx-auto">
-        <header class="flex justify-between items-center mb-6">
-            <h1 id="catTitle" class="text-xl font-black uppercase text-sky-500 tracking-tighter">Category</h1>
-            <a href="index.html" class="text-xs font-bold bg-white/5 px-4 py-2 rounded-full border border-white/10">BACK</a>
-        </header>
-
-        <div id="loader" class="text-center py-20 text-slate-500 font-mono text-xs animate-pulse">Establishing Secure Pipeline...</div>
-        
-        <div class="space-y-4" id="matchGrid"></div>
+        <h1 class="text-xl font-black uppercase text-sky-500 mb-6 tracking-tighter">M3U Pipeline</h1>
+        <div id="matchGrid" class="space-y-4"></div>
     </div>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const catName = params.get('source');
-        const sources = JSON.parse(localStorage.getItem('category_sources')) || {};
-        const API_URL = sources[catName?.toUpperCase()];
+        const M3U_URL = 'https://raw.githubusercontent.com/jitendra-unatti/fancode/refs/heads/main/data/fancode.m3u';
 
-        document.getElementById('catTitle').textContent = catName || "Signals";
-
-        async function fetchSignals() {
-            if(!API_URL) {
-                document.getElementById('loader').textContent = "No JSON URL found for this category.";
-                return;
-            }
-
+        async function parseM3U() {
             try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
+                const res = await fetch(M3U_URL);
+                const data = await res.text();
                 const grid = document.getElementById('matchGrid');
-                document.getElementById('loader').style.display = 'none';
+                const lines = data.split('\n');
+                
+                let currentItem = {};
 
-                // FanCode JSON has a 'matches' array
-                const matches = data.matches || data;
-
-                matches.forEach(m => {
-                    const isLive = m.status === "LIVE";
-                    // Taking first team logo as placeholder if match-specific team array exists
-                    const team1Logo = m.team?.[0]?.flag?.src || 'https://via.placeholder.com/50';
-                    const team2Logo = m.team?.[1]?.flag?.src || 'https://via.placeholder.com/50';
-
-                    grid.innerHTML += `
-                    <div class="match-card rounded-3xl overflow-hidden shadow-2xl">
-                        <div class="relative">
-                            <img src="${m.image || m.image_cdn?.APP}" class="w-full aspect-video object-cover">
-                            <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg text-[10px] font-bold text-sky-400 border border-sky-500/30">${m.category}</div>
-                            ${isLive ? '<div class="absolute bottom-4 right-4 bg-red-600 px-3 py-1 rounded-lg text-[10px] font-black animate-pulse">LIVE</div>' : ''}
-                        </div>
-                        
-                        <div class="p-6">
-                            <div class="text-[10px] text-slate-500 font-bold uppercase mb-3 text-center tracking-widest">${m.tournament || ''}</div>
-                            
-                            <div class="flex items-center justify-around mb-6">
-                                <div class="text-center w-1/3">
-                                    <img src="${team1Logo}" class="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-white/5 p-1 bg-black">
-                                    <div class="text-[11px] font-bold truncate">${m.team?.[0]?.shortName || 'T1'}</div>
-                                </div>
-                                <div class="text-xl font-black text-slate-700 italic">VS</div>
-                                <div class="text-center w-1/3">
-                                    <img src="${team2Logo}" class="w-12 h-12 mx-auto mb-2 rounded-full border-2 border-white/5 p-1 bg-black">
-                                    <div class="text-[11px] font-bold truncate">${m.team?.[1]?.shortName || 'T2'}</div>
-                                </div>
+                lines.forEach(line => {
+                    if (line.startsWith('#EXTINF:')) {
+                        const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+                        currentItem.thumb = logoMatch ? logoMatch[1] : '';
+                        currentItem.title = line.split(',')[1] || "Live Match";
+                    } else if (line.startsWith('http')) {
+                        const streamLink = line.trim();
+                        grid.innerHTML += `
+                        <div class="m3u-card rounded-3xl overflow-hidden p-4 flex items-center gap-4 cursor-pointer" 
+                             onclick="location.href='player.html?url=${encodeURIComponent(streamLink)}&title=${encodeURIComponent(currentItem.title)}'">
+                            <img src="${currentItem.thumb}" class="w-16 h-16 rounded-xl object-cover bg-black">
+                            <div class="flex-1">
+                                <div class="text-[10px] text-sky-500 font-bold uppercase tracking-widest">Live Stream</div>
+                                <div class="font-bold text-sm">${currentItem.title}</div>
                             </div>
-
-                            <div class="text-center text-[11px] font-bold text-sky-500 mb-5">🕒 ${m.startTime}</div>
-
-                            <a href="player.html?id=${m.match_id}" class="block w-full bg-sky-500 hover:bg-sky-400 text-black text-center py-4 rounded-2xl font-black text-sm transition-all active:scale-95 shadow-lg shadow-sky-500/20">
-                                WATCH SIGNAL
-                            </a>
-                        </div>
-                    </div>`;
+                            <div class="bg-sky-500/20 text-sky-400 p-2 rounded-full"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+                        </div>`;
+                        currentItem = {};
+                    }
                 });
-
-            } catch (err) {
-                document.getElementById('loader').textContent = "Failed to parse signals. Check CORS or JSON link.";
-            }
+            } catch (err) { console.error("M3U Fetch Error"); }
         }
-
-        window.onload = fetchSignals;
+        window.onload = parseM3U;
     </script>
 </body>
 </html>
