@@ -2,219 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE ADMIN | Master Control V12</title>
+    <title>ELITE ADMIN | SOURCE ENGINE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #ff0055; --bg: #000; --card: #0d0d0d; --border: rgba(255,255,255,0.1); }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: white; padding: 20px; margin: 0; }
-        
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { text-align: center; padding: 20px; border-bottom: 2px solid var(--accent); margin-bottom: 30px; }
-        .header span { color: var(--accent); font-weight: 900; }
-
-        .box { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 20px; margin-bottom: 25px; }
-        h2 { font-size: 1.2rem; margin-top: 0; color: #eee; display: flex; align-items: center; gap: 10px; }
-        
-        input, select, textarea { 
-            width: 100%; padding: 12px; margin: 10px 0; background: #111; 
-            border: 1px solid #333; color: #fff; border-radius: 10px; font-size: 0.9rem;
-        }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-        button { 
-            padding: 15px; border: none; border-radius: 12px; font-weight: 800; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase; 
-        }
-        .btn-deploy { width: 100%; background: var(--accent); color: white; margin-top: 10px; }
-        .btn-update { width: 100%; background: #00ff41; color: black; display: none; margin-top: 10px; }
-        
-        /* List Styling */
-        .stream-list { margin-top: 10px; }
-        .stream-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px; background: #080808; border: 1px solid #1a1a1a; 
-            border-radius: 12px; margin-bottom: 10px;
-        }
-        .stream-info b { color: var(--accent); font-size: 0.8rem; }
-        .actions { display: flex; gap: 8px; }
-        .actions button { padding: 6px 12px; font-size: 0.7rem; border-radius: 6px; }
-        
-        .status-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 5px; background: #222; }
+        :root { --accent: #ff0055; --bg: #050505; --card: #0d0d0d; --border: rgba(255,255,255,0.08); --neon: #00ff41; }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; padding: 20px; }
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; max-width: 800px; margin: 0 auto 20px; }
+        h2 { font-size: 0.9rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: #fff; border-radius: 10px; }
+        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .btn-green { background: var(--neon); color: #000; }
+        .list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="header">
-        <h1>ELITE<span>ADMIN</span> MASTER</h1>
-        <p style="font-size: 0.8rem; color: #666;">Control Everything from Here</p>
+    <div class="panel" style="border-color: var(--neon);">
+        <h2>📂 LINK CATEGORY TO JSON SOURCE</h2>
+        <input type="text" id="catName" placeholder="Category Name (e.g., FANCODE)">
+        <input type="text" id="catJson" placeholder="Direct JSON URL (https://...)">
+        <button class="btn btn-green" onclick="mapSource()">Map & Sync Source</button>
     </div>
 
-    <div class="box">
-        <h2>📢 Announcement Ticker</h2>
-        <input id="alertText" placeholder="Enter emergency notice or welcome message...">
-        <div class="grid-2">
-            <button onclick="saveConfig(true)" style="background:#222; color:white;">Master ON</button>
-            <button onclick="saveConfig(false)" style="background:#441111; color:white;">Master OFF (Maintenance)</button>
-        </div>
+    <div class="panel">
+        <h2>📊 Active Category Sources</h2>
+        <div id="sourceList"></div>
     </div>
 
-    <div class="box">
-        <h2 id="formTitle">🚀 Deploy New Pipeline</h2>
-        <input type="hidden" id="editIndex">
-        
-        <input id="title" placeholder="Stream Title (e.g. IPL 2024: MI vs CSK)">
-        <input id="thumb" placeholder="Thumbnail URL (Direct Link .jpg/.png)">
-        
-        <div class="grid-2">
-            <select id="category">
-                <option value="CRICKET">CRICKET</option>
-                <option value="F1">F1 RACING</option>
-                <option value="MOVIES">MOVIES</option>
-                <option value="LIVETV">LIVE TV</option>
-            </select>
-            <select id="aspect">
-                <option value="landscape">Landscape (16:9)</option>
-                <option value="portrait">Portrait (9:16)</option>
-            </select>
-        </div>
+    <script>
+        function mapSource() {
+            const name = document.getElementById('catName').value.toUpperCase().trim();
+            const url = document.getElementById('catJson').value.trim();
+            if(!name || !url) return alert("Fill both fields!");
 
-        <div class="grid-3">
-            <input id="url1" placeholder="Server 1 URL">
-            <input id="url2" placeholder="Server 2 URL">
-            <input id="url3" placeholder="Server 3 URL">
-        </div>
-
-        <button id="addBtn" class="btn-deploy" onclick="addStream()">Push to Index</button>
-        <button id="updateBtn" class="btn-update" onclick="updateStream()">Save Changes & Sync</button>
-        <button id="cancelBtn" onclick="resetForm()" style="display:none; width:100%; margin-top:5px; background:#333; color:white;">Cancel Edit</button>
-    </div>
-
-    <div class="box">
-        <h2>📺 Content Manager</h2>
-        <div id="streamList" class="stream-list">
-            </div>
-    </div>
-</div>
-
-<script>
-    // Data Loading
-    let streams = JSON.parse(localStorage.getItem('elite_data')) || [];
-    let config = JSON.parse(localStorage.getItem('elite_config')) || { master: true, alert: "" };
-
-    // Initial Render
-    function init() {
-        document.getElementById('alertText').value = config.alert;
-        renderStreams();
-    }
-
-    function renderStreams() {
-        const list = document.getElementById('streamList');
-        list.innerHTML = streams.length ? '' : '<p style="color:#444; text-align:center;">No active streams found.</p>';
-        
-        streams.forEach((s, i) => {
-            list.innerHTML += `
-                <div class="stream-item">
-                    <div class="stream-info">
-                        <b>${s.category}</b><br>
-                        <span>${s.title}</span> <span class="status-badge">${s.aspect}</span>
-                    </div>
-                    <div class="actions">
-                        <button style="background:#222; color:white;" onclick="editStream(${i})">EDIT</button>
-                        <button style="background:#ff3333; color:white;" onclick="deleteStream(${i})">DEL</button>
-                    </div>
-                </div>`;
-        });
-    }
-
-    // Add Stream
-    function addStream() {
-        const newStream = {
-            title: document.getElementById('title').value,
-            thumb: document.getElementById('thumb').value,
-            category: document.getElementById('category').value,
-            aspect: document.getElementById('aspect').value,
-            url1: document.getElementById('url1').value,
-            url2: document.getElementById('url2').value,
-            url3: document.getElementById('url3').value
-        };
-
-        if(!newStream.title || !newStream.url1) return alert("Title and Server 1 are required!");
-        
-        streams.push(newStream);
-        syncData();
-        resetForm();
-    }
-
-    // Edit Stream (Load data into form)
-    function editStream(i) {
-        const s = streams[i];
-        document.getElementById('editIndex').value = i;
-        document.getElementById('title').value = s.title;
-        document.getElementById('thumb').value = s.thumb;
-        document.getElementById('category').value = s.category;
-        document.getElementById('aspect').value = s.aspect || 'landscape';
-        document.getElementById('url1').value = s.url1;
-        document.getElementById('url2').value = s.url2;
-        document.getElementById('url3').value = s.url3;
-
-        document.getElementById('addBtn').style.display = 'none';
-        document.getElementById('updateBtn').style.display = 'block';
-        document.getElementById('cancelBtn').style.display = 'block';
-        document.getElementById('formTitle').innerText = "📝 Editing: " + s.title;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Update Stream (Save changes)
-    function updateStream() {
-        const i = document.getElementById('editIndex').value;
-        streams[i] = {
-            title: document.getElementById('title').value,
-            thumb: document.getElementById('thumb').value,
-            category: document.getElementById('category').value,
-            aspect: document.getElementById('aspect').value,
-            url1: document.getElementById('url1').value,
-            url2: document.getElementById('url2').value,
-            url3: document.getElementById('url3').value
-        };
-        syncData();
-        resetForm();
-    }
-
-    // Delete
-    function deleteStream(i) {
-        if(confirm("Are you sure you want to remove this card?")) {
-            streams.splice(i, 1);
-            syncData();
+            let mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
+            mappings[name] = url;
+            localStorage.setItem('category_sources', JSON.stringify(mappings));
+            
+            alert(name + " is now linked!");
+            location.reload();
         }
-    }
 
-    // Config (Alert/Master)
-    function saveConfig(status) {
-        config.master = status;
-        config.alert = document.getElementById('alertText').value;
-        localStorage.setItem('elite_config', JSON.stringify(config));
-        alert("System Configuration Updated!");
-    }
+        function renderSources() {
+            const list = document.getElementById('sourceList');
+            const mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
+            for (let name in mappings) {
+                list.innerHTML += `<div class="list-item">
+                    <span><b>${name}</b> → ${mappings[name].substring(0,40)}...</span>
+                    <button onclick="removeSource('${name}')" style="background:red; color:white; border:none; border-radius:5px; padding:2px 8px; cursor:pointer;">DEL</button>
+                </div>`;
+            }
+        }
 
-    function syncData() {
-        localStorage.setItem('elite_data', JSON.stringify(streams));
-        renderStreams();
-    }
-
-    function resetForm() {
-        document.querySelectorAll('input').forEach(inp => inp.value = '');
-        document.getElementById('addBtn').style.display = 'block';
-        document.getElementById('updateBtn').style.display = 'none';
-        document.getElementById('cancelBtn').style.display = 'none';
-        document.getElementById('formTitle').innerText = "🚀 Deploy New Pipeline";
-    }
-
-    window.onload = init;
-</script>
-
+        function removeSource(name) {
+            let mappings = JSON.parse(localStorage.getItem('category_sources')) || {};
+            delete mappings[name];
+            localStorage.setItem('category_sources', JSON.stringify(mappings));
+            location.reload();
+        }
+        window.onload = renderSources;
+    </script>
 </body>
 </html>
