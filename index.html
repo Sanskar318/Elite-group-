@@ -3,79 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tushar Stream | Fast Load</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Elite Stream | FanCode Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { background: #0b0f14; font-family: sans-serif; color: white; }
-        .ch-card { background: #161b22; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; cursor: pointer; }
-        .ch-card:hover { border-color: #00ffcc; transform: scale(1.02); }
-    </style>
-</head>
-<body class="p-4">
-
-    <div class="max-w-4xl mx-auto flex justify-between items-center mb-6 p-4 bg-slate-900/80 rounded-2xl border border-white/5">
-        <h1 class="text-lg font-bold text-sky-400 uppercase">Tushar Stream</h1>
-        <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded-full border border-green-500/30">FAST-SYNC ON</span>
-    </div>
-
-    <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4" id="channelGrid">
-        <div id="loader" class="col-span-full text-center py-20">
-            <div class="inline-block w-8 h-8 border-4 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-            <p class="mt-4 text-slate-500 text-sm italic">Connecting to Pipeline...</p>
-        </div>
-    </div>
-
-    <script>
-        // 1. URL ke peeche Timestamp joda hai taaki har baar fresh data aaye
-        const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json?t=' + Date.now();
-
-        async function fetchData() {
-            const grid = document.getElementById('channelGrid');
-            const loader = document.getElementById('loader');
-
-            try {
-                // 2. Fetch with no-cache headers
-                const response = await fetch(JSON_URL, {
-                    method: 'GET',
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
-
-                if (!response.ok) throw new Error("Server Response Error");
-
-                const data = await response.json();
-                
-                // 3. Sabhi types ke JSON format ko support karne ke liye check
-                const channels = Array.isArray(data) ? data : (data.channels || data.iframes || data.data || []);
-
-                if (channels.length === 0) {
-                    loader.innerHTML = "No Channels Found!";
-                    return;
-                }
-
-                loader.remove(); // Remove spinner immediately
-
-                // 4. Fast Rendering
-                let html = '';
-                channels.forEach(ch => {
-                    const link = ch.link || ch.iframeSrc || ch.url;
-                    const logo = ch.logo || ch.image || 'https://via.placeholder.com/150?text=TV';
-                    const name = ch.name || "Live Channel";
-
-                    html += `
-                    <div class="ch-card rounded-2xl overflow-hidden p-3" onclick="location.href='player.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(name)}'">
-                        <img src="${logo}" class="w-full aspect-square object-contain bg-black rounded-xl mb-3 p-2" loading="lazy">
-                        <div class="text-[11px] font-bold text-center truncate uppercase">${name}</div>
-                    </div>`;
-                });
-                grid.innerHTML = html;
-
-            } catch (err) {
-                loader.innerHTML = `<p class="text-red-500 font-bold">Error: ${err.message}<br><span class="text-xs text-slate-500">Check if JSON is Public</span></p>`;
-            }
+        :root {
+            --bg: #0b0228;
+            --card: #140836;
+            --header: #07011a;
+            --accent: #ff2e93;
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
         }
 
-        // Fast load on DOM ready
-        document.addEventListener('DOMContentLoaded', fetchData);
-    </script>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding-bottom: 50px;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--header);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo { font-family: 'Fjalla One', sans-serif; font-size: 24px; color: var(--accent); font-style: italic; }
+
+        /* SEARCH */
+        .search-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 200px;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 12px;
+            outline: none;
+            width: 100%;
+        }
+
+        /* CATEGORIES */
+        .categories {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .categories::-webkit-scrollbar { display: none; }
+
+        .cat-btn {
+            padding: 8px 18px;
+            background: var(--card);
+            border-radius: 25px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+        }
+        .cat-btn.active { background: var(--accent); border-color: var(--accent); }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+        .card-img-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            position: relative;
+        }
+        .card-img { width: 100%; height: 100%; object-fit: contain; }
+
+        .badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--accent);
+            padding: 3px 8px;
+            font-size: 9px;
+            font-weight: 800;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .live-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ff3b3b;
+            padding: 3px 8px;
+            font-size: 9px;
+            font-weight: 800;
+            border-radius: 4px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .card-body { padding: 12px; }
+        .tournament { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .match-title { font-family: 'Fjalla One', sans-serif; font-size: 14px; margin-bottom: 8px; letter-spacing: 0.5px; }
+        
+        .watch-btn {
+            background: rgba(255,255,255,0.05);
+            text-align: center;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent);
+            border: 1px solid rgba(255,46,147,0.2);
+        }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
+            .search-box { width: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">TUSHAR STREAM</div>
+    <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass" style="font-size: 12px; opacity: 0.5;"></i>
+        <input type="text" id="searchInput" placeholder="Search Stream...">
+    </div>
+</header>
+
+<div id="categories" class="categories">
+    <div class="cat-btn active" onclick="filterCat('All', this)">ALL</div>
+</div>
+
+<div id="grid" class="grid">
+    </div>
+
+<script>
+    const JSON_URL = 'https://raw.githubusercontent.com/vaathala00/jow/main/output.json?v=' + Date.now();
+    let allData = [];
+
+    async function loadStreams() {
+        const grid = document.getElementById('grid');
+        try {
+            const res = await fetch(JSON_URL);
+            allData = await res.json();
+            
+            // Build Categories
+            const categoriesDiv = document.getElementById('categories');
+            const cats = ['All', ...new Set(allData.map(ch => ch.category || 'Live TV'))];
+            categoriesDiv.innerHTML = '';
+            cats.forEach(c => {
+                const btn = document.createElement('div');
+                btn.className = `cat-btn ${c === 'All' ? 'active' : ''}`;
+                btn.innerText = c.toUpperCase();
+                btn.onclick = () => filterCat(c, btn);
+                categoriesDiv.appendChild(btn);
+            });
+
+            render(allData);
+        } catch (e) {
+            grid.innerHTML = "Error loading streams...";
+        }
+    }
+
+    function render(list) {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        list.forEach(ch => {
+            const link = ch.link || ch.iframeSrc;
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => location.href = `player.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(ch.name)}`;
+            
+            card.innerHTML = `
+                <div class="card-img-container">
+                    <img src="${ch.logo}" class="card-img" onerror="this.src='https://via.placeholder.com/300x168/000/fff?text=No+Logo'">
+                    <span class="badge">${ch.category || 'LIVE'}</span>
+                    <span class="live-status text-white">LIVE</span>
+                </div>
+                <div class="card-body">
+                    <div class="tournament">Tushar Stream Special</div>
+                    <div class="match-title">${ch.name}</div>
+                    <div class="watch-btn">WATCH IN HD</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterCat(cat, btn) {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filtered = cat === 'All' ? allData : allData.filter(ch => (ch.category || 'Live TV') === cat);
+        render(filtered);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        const searched = allData.filter(ch => ch.name.toLowerCase().includes(val));
+        render(searched);
+    });
+
+    window.onload = loadStreams;
+</script>
+
 </body>
 </html>
