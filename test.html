@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamHub - Live Sports & IPTV</title>
+    <title>StreamFlix - Ultimate OTT & Live Hub</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -13,174 +13,148 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-[#090d16] text-white font-sans min-h-screen pb-24 selection:bg-blue-600">
+<body class="bg-[#0b0e14] text-white font-sans min-h-screen pb-24 selection:bg-red-600">
 
-    <!-- Header / Navbar -->
-    <header class="flex justify-between items-center px-4 py-3 bg-[#0e1424] border-b border-gray-800 sticky top-0 z-50">
-        <div class="flex items-center space-x-2">
-            <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-xs shadow-md shadow-blue-600/40">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <span class="font-black text-base tracking-wider">STREAMHUB</span>
+    <!-- Top Netflix/Prime Style Navbar -->
+    <header class="flex justify-between items-center px-4 py-3 bg-[#0b0e14]/90 backdrop-blur-md border-b border-gray-800/60 sticky top-0 z-50">
+        <div class="flex items-center space-x-6">
+            <span class="font-black text-lg tracking-wider text-red-600">STREAMFLIX</span>
+            <nav class="hidden sm:flex space-x-4 text-xs text-gray-300 font-medium">
+                <a href="#" class="text-white font-bold">Home</a>
+                <a href="#" class="hover:text-white transition">Live Sports</a>
+                <a href="#" class="hover:text-white transition">Movies</a>
+                <a href="#" class="hover:text-white transition">Web Series</a>
+            </nav>
         </div>
-        <div class="flex items-center space-x-2">
-            <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 font-semibold">
-                ● Servers Online
-            </span>
+        <div class="flex items-center space-x-3">
+            <button class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-300 hover:text-white"><i class="fa-solid fa-search text-xs"></i></button>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-red-600 to-orange-500 flex items-center justify-center font-bold text-xs">SF</div>
         </div>
     </header>
 
-    <!-- Scrolling Announcement Bar (Allrounder Live style) -->
-    <div class="bg-blue-600/10 border-y border-blue-500/20 py-1.5 px-4 overflow-hidden whitespace-nowrap text-xs text-blue-300">
-        <div class="inline-block animate-marquee font-medium">
-            🔥 Welcome to StreamHub! If any stream lags or stops, please switch to <b>Server 2</b> or <b>Server 3</b> below. Enjoy uninterrupted sports! 🚀
-        </div>
-    </div>
-
     <!-- Main Container -->
-    <main class="p-4 max-w-md mx-auto sm:max-w-xl">
+    <main class="max-w-md mx-auto sm:max-w-2xl p-4">
 
-        <!-- Featured Match Banner -->
-        <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-blue-900 to-slate-900 p-4 shadow-xl mb-5 border border-blue-800/50">
-            <div class="flex justify-between items-center mb-2">
-                <span class="bg-red-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">LIVE NOW</span>
-                <span class="text-xs text-gray-300">ICC Champions Trophy</span>
+        <!-- Jio/Hotstar Style Live Sport Banner (Top Hero) -->
+        <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-blue-950 via-slate-900 to-black p-5 shadow-2xl mb-6 border border-blue-900/40">
+            <div class="flex justify-between items-center mb-3">
+                <span class="bg-red-600 text-[10px] px-2 py-0.5 rounded font-extrabold uppercase tracking-widest animate-pulse">● HOT LIVE</span>
+                <span class="text-xs text-gray-400 font-medium">IPL / Cricket • Multi-Server</span>
             </div>
-            <h1 class="text-lg font-bold mb-1">IND vs PAK - Grand Finale</h1>
-            <p class="text-xs text-gray-300 mb-3">Multi-server 1080p HD stream available with zero ads.</p>
-            
-            <button onclick="openPlayerModal('IND vs PAK Live', 'Server 1')" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2 px-4 rounded-xl transition flex items-center space-x-1.5 shadow-lg shadow-red-600/30">
-                <i class="fa-solid fa-play text-[10px]"></i>
-                <span>Play Live Stream</span>
-            </button>
-        </div>
-
-        <!-- Category Filter Tabs -->
-        <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2 mb-4">
-            <button class="bg-blue-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl whitespace-nowrap shadow">All Channels</button>
-            <button class="bg-[#121826] text-gray-400 hover:text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl whitespace-nowrap border border-gray-800">🏏 Cricket</button>
-            <button class="bg-[#121826] text-gray-400 hover:text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl whitespace-nowrap border border-gray-800">⚽ Football</button>
-            <button class="bg-[#121826] text-gray-400 hover:text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl whitespace-nowrap border border-gray-800">🏎️ F1 & Sports</button>
-            <button class="bg-[#121826] text-gray-400 hover:text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl whitespace-nowrap border border-gray-800">📺 TV Channels</button>
-        </div>
-
-        <!-- Channel Grid Layout (Cricfy / Allrounder style) -->
-        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Live Channels & Matches</h2>
-        <div class="grid grid-cols-2 gap-3">
-            
-            <!-- Channel Card 1 -->
-            <div onclick="openPlayerModal('Star Sports 1 HD', 'Server 1')" class="bg-[#121826] p-3 rounded-xl border border-gray-800 hover:border-blue-500 transition cursor-pointer group">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-tv"></i></span>
-                    <span class="bg-red-500/20 text-red-400 text-[10px] px-1.5 py-0.5 rounded font-bold">HD</span>
-                </div>
-                <h3 class="font-bold text-xs mb-0.5 group-hover:text-blue-400 transition">Star Sports 1 HD</h3>
-                <p class="text-[10px] text-gray-400">Cricket Live Feed</p>
-            </div>
-
-            <!-- Channel Card 2 -->
-            <div onclick="openPlayerModal('Sony Sports Ten 5', 'Server 1')" class="bg-[#121826] p-3 rounded-xl border border-gray-800 hover:border-blue-500 transition cursor-pointer group">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-futbol"></i></span>
-                    <span class="bg-red-500/20 text-red-400 text-[10px] px-1.5 py-0.5 rounded font-bold">HD</span>
-                </div>
-                <h3 class="font-bold text-xs mb-0.5 group-hover:text-blue-400 transition">Sony Sports 5</h3>
-                <p class="text-[10px] text-gray-400">Football & WWE</p>
-            </div>
-
-            <!-- Channel Card 3 -->
-            <div onclick="openPlayerModal('Sports18 1', 'Server 1')" class="bg-[#121826] p-3 rounded-xl border border-gray-800 hover:border-blue-500 transition cursor-pointer group">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-baseball"></i></span>
-                    <span class="bg-red-500/20 text-red-400 text-[10px] px-1.5 py-0.5 rounded font-bold">FHD</span>
-                </div>
-                <h3 class="font-bold text-xs mb-0.5 group-hover:text-blue-400 transition">Sports18 1 HD</h3>
-                <p class="text-[10px] text-gray-400">JioCinema Feed</p>
-            </div>
-
-            <!-- Channel Card 4 -->
-            <div onclick="openPlayerModal('F1 TV Pro Stream', 'Server 1')" class="bg-[#121826] p-3 rounded-xl border border-gray-800 hover:border-blue-500 transition cursor-pointer group">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="w-7 h-7 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-flag-checkered"></i></span>
-                    <span class="bg-red-500/20 text-red-400 text-[10px] px-1.5 py-0.5 rounded font-bold">60FPS</span>
-                </div>
-                <h3 class="font-bold text-xs mb-0.5 group-hover:text-blue-400 transition">F1 TV Pro Feed</h3>
-                <p class="text-[10px] text-gray-400">On-Board & Telemetry</p>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Simulated Player Modal (with Multi-Server Switching) -->
-    <div id="playerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col justify-center items-center p-4">
-        <div class="w-full max-w-lg bg-[#0e1424] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
-            <!-- Video Mock Box -->
-            <div class="relative w-full h-56 bg-black flex items-center justify-center text-center p-4">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                <div class="z-10">
-                    <i class="fa-solid fa-circle-play text-4xl text-blue-500 mb-2 animate-bounce"></i>
-                    <h3 id="modalTitle" class="font-bold text-sm text-white">Streaming Channel</h3>
-                    <p class="text-[10px] text-gray-400 mt-1">Playing via <span id="activeServerText" class="text-blue-400 font-bold">Server 1</span></p>
-                </div>
-                <button onclick="closePlayerModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-800 text-gray-300 flex items-center justify-center z-20 hover:bg-red-600 hover:text-white transition">
-                    <i class="fa-solid fa-xmark text-xs"></i>
+            <h1 class="text-xl font-black mb-1">IND vs AUS - Grand Finale</h1>
+            <p class="text-xs text-gray-300 mb-4">Watch live stream with real-time stats and zero-buffer switching.</p>
+            <div class="flex space-x-2">
+                <button onclick="alert('Starting Stream...')" class="bg-white text-black font-bold text-xs py-2 px-5 rounded-lg flex items-center space-x-1.5 hover:bg-gray-200 transition">
+                    <i class="fa-solid fa-play text-xs text-red-600"></i>
+                    <span>Watch Now</span>
+                </button>
+                <button onclick="alert('Added to Watchlist')" class="bg-gray-800/80 hover:bg-gray-700 text-white font-semibold text-xs py-2 px-4 rounded-lg backdrop-blur border border-gray-700 transition">
+                    + Watchlist
                 </button>
             </div>
-
-            <!-- Multi-Server Selector Tabs (Crucial Feature) -->
-            <div class="p-4 bg-[#121826]">
-                <p class="text-[11px] text-gray-400 mb-2 font-medium">⚠️ Stream lag hone par server change karein:</p>
-                <div class="grid grid-cols-3 gap-2">
-                    <button onclick="switchServer('Server 1')" id="btn-server1" class="bg-blue-600 text-white font-bold text-xs py-2 rounded-xl transition">Server 1 (FHD)</button>
-                    <button onclick="switchServer('Server 2')" id="btn-server2" class="bg-[#1a2338] text-gray-300 font-semibold text-xs py-2 rounded-xl border border-gray-700 transition">Server 2 (HD)</button>
-                    <button onclick="switchServer('Server 3')" id="btn-server3" class="bg-[#1a2338] text-gray-300 font-semibold text-xs py-2 rounded-xl border border-gray-700 transition">Server 3 (Backup)</button>
-                </div>
-            </div>
         </div>
-    </div>
 
-    <!-- Bottom Navigation Dock -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#0e1424] border-t border-gray-800 flex justify-around py-3 text-gray-400 text-[11px] z-40">
-        <button class="flex flex-col items-center text-blue-500 font-semibold">
+        <!-- Category Horizontal Pills -->
+        <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2 mb-6">
+            <button class="bg-red-600 text-white text-xs font-bold px-4 py-1.5 rounded-full whitespace-nowrap shadow-md shadow-red-600/30">All</button>
+            <button class="bg-[#151b26] text-gray-400 hover:text-white text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap border border-gray-800">🔥 Trending</button>
+            <button class="bg-[#151b26] text-gray-400 hover:text-white text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap border border-gray-800">🏏 Live Sports</button>
+            <button class="bg-[#151b26] text-gray-400 hover:text-white text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap border border-gray-800">🎬 Movies</button>
+            <button class="bg-[#151b26] text-gray-400 hover:text-white text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap border border-gray-800">📺 TV Shows</button>
+        </div>
+
+        <!-- Netflix / Prime Style Horizontal Row: Continue Watching / Live Channels -->
+        <section class="mb-6">
+            <h2 class="text-sm font-bold text-gray-200 mb-3 tracking-wide">Live Sports & Channels</h2>
+            <div class="grid grid-cols-2 gap-3">
+                
+                <div class="bg-[#151b26] p-3 rounded-xl border border-gray-800 hover:border-red-600/60 transition cursor-pointer group">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-blue-400"><i class="fa-solid fa-trophy mr-1"></i> Star Sports 1</span>
+                        <span class="text-[10px] bg-red-600/20 text-red-500 font-bold px-1.5 py-0.5 rounded">HD</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-2">Live Cricket Match Feed</p>
+                    <div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden">
+                        <div class="bg-red-600 h-full w-[80%]"></div>
+                    </div>
+                </div>
+
+                <div class="bg-[#151b26] p-3 rounded-xl border border-gray-800 hover:border-red-600/60 transition cursor-pointer group">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-purple-400"><i class="fa-solid fa-futbol mr-1"></i> Sony Sports 5</span>
+                        <span class="text-[10px] bg-red-600/20 text-red-500 font-bold px-1.5 py-0.5 rounded">FHD</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-2">Premier League Football</p>
+                    <div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden">
+                        <div class="bg-red-600 h-full w-[40%]"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Prime Video Style Poster Grid (Movies & Web Series) -->
+        <section>
+            <h2 class="text-sm font-bold text-gray-200 mb-3 tracking-wide">Trending Movies & Series</h2>
+            <div class="grid grid-cols-3 gap-2.5">
+                
+                <div class="bg-[#151b26] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer hover:scale-105 transition duration-300">
+                    <div class="h-28 bg-gradient-to-tr from-gray-900 to-gray-800 flex items-center justify-center relative">
+                        <i class="fa-solid fa-film text-gray-600 text-2xl group-hover:text-red-500 transition"></i>
+                        <span class="absolute top-1 left-1 bg-black/60 backdrop-blur text-[9px] px-1.5 py-0.5 rounded text-gray-300">Prime</span>
+                    </div>
+                    <div class="p-2">
+                        <h3 class="text-xs font-bold truncate">Action Thriller</h3>
+                        <p class="text-[10px] text-gray-400">2026 • 2h 15m</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#151b26] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer hover:scale-105 transition duration-300">
+                    <div class="h-28 bg-gradient-to-tr from-gray-900 to-gray-800 flex items-center justify-center relative">
+                        <i class="fa-solid fa-tv text-gray-600 text-2xl group-hover:text-red-500 transition"></i>
+                        <span class="absolute top-1 left-1 bg-black/60 backdrop-blur text-[9px] px-1.5 py-0.5 rounded text-gray-300">Netflix</span>
+                    </div>
+                    <div class="p-2">
+                        <h3 class="text-xs font-bold truncate">Sci-Fi Series S2</h3>
+                        <p class="text-[10px] text-gray-400">8 Episodes</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#151b26] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer hover:scale-105 transition duration-300">
+                    <div class="h-28 bg-gradient-to-tr from-gray-900 to-gray-800 flex items-center justify-center relative">
+                        <i class="fa-solid fa-fire text-gray-600 text-2xl group-hover:text-red-500 transition"></i>
+                        <span class="absolute top-1 left-1 bg-black/60 backdrop-blur text-[9px] px-1.5 py-0.5 rounded text-gray-300">Hotstar</span>
+                    </div>
+                    <div class="p-2">
+                        <h3 class="text-xs font-bold truncate">Blockbuster Movie</h3>
+                        <p class="text-[10px] text-gray-400">2026 • Action</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#0b0e14]/95 backdrop-blur-lg border-t border-gray-800/80 flex justify-around py-3 text-gray-400 text-[11px] z-50">
+        <button class="flex flex-col items-center text-red-600 font-bold">
             <i class="fa-solid fa-house text-base mb-1"></i>
             <span>Home</span>
         </button>
-        <button class="flex flex-col items-center hover:text-white">
-            <i class="fa-solid fa-tv text-base mb-1"></i>
-            <span>IPTV</span>
+        <button class="flex flex-col items-center hover:text-white transition">
+            <i class="fa-solid fa-bolt text-base mb-1"></i>
+            <span>Live Sports</span>
         </button>
-        <button class="flex flex-col items-center hover:text-white">
-            <i class="fa-solid fa-clock-rotate-left text-base mb-1"></i>
-            <span>Schedule</span>
+        <button class="flex flex-col items-center hover:text-white transition">
+            <i class="fa-solid fa-film text-base mb-1"></i>
+            <span>Movies</span>
+        </button>
+        <button class="flex flex-col items-center hover:text-white transition">
+            <i class="fa-solid fa-download text-base mb-1"></i>
+            <span>Downloads</span>
         </button>
     </nav>
 
-    <!-- JavaScript for Modal & Server Switching -->
-    <script>
-        function openPlayerModal(title, server) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('activeServerText').innerText = server;
-            document.getElementById('playerModal').classList.remove('hidden');
-        }
-
-        function closePlayerModal() {
-            document.getElementById('playerModal').classList.add('hidden');
-        }
-
-        function switchServer(serverName) {
-            document.getElementById('activeServerText').innerText = serverName;
-            
-            // Highlight active server button
-            ['Server 1', 'Server 2', 'Server 3'].forEach(s => {
-                let btnId = 'btn-' + s.toLowerCase().replace(' ', '');
-                let btn = document.getElementById(btnId);
-                if(s === serverName) {
-                    btn.className = "bg-blue-600 text-white font-bold text-xs py-2 rounded-xl transition shadow";
-                } else {
-                    btn.className = "bg-[#1a2338] text-gray-300 font-semibold text-xs py-2 rounded-xl border border-gray-700 transition";
-                }
-            });
-        }
-    </script>
 </body>
-                        </html>
+    </html>
