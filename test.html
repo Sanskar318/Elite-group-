@@ -3,96 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamHub - Test Dashboard</title>
+    <title>StreamHub - Ultimate Live Sports & Media Hub</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar hiding for smooth horizontal scrolling */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-[#0b0f19] text-white font-sans min-h-screen pb-20">
+<body class="bg-[#070b14] text-white font-sans min-h-screen pb-24 selection:bg-blue-600 selection:text-white">
 
-    <!-- Navbar -->
-    <nav class="flex justify-between items-center px-4 py-3 bg-[#131b2e] border-b border-gray-800 sticky top-0 z-50">
+    <!-- Top Header / Navbar -->
+    <header class="flex justify-between items-center px-4 py-3 bg-[#0d1322]/80 backdrop-blur-md border-b border-gray-800/80 sticky top-0 z-50">
         <div class="flex items-center space-x-2">
-            <span class="text-blue-500 font-black text-xl tracking-wider"><i class="fa-solid fa-play-circle"></i> STREAMHUB</span>
-        </div>
-        <div class="flex items-center space-x-4">
-            <button class="text-gray-400 hover:text-white"><i class="fa-solid fa-search text-lg"></i></button>
-            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm">S</div>
-        </div>
-    </nav>
-
-    <!-- Main Container -->
-    <main class="p-4 max-w-4xl mx-auto">
-
-        {/* Featured Live Banner */}
-        <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-5 shadow-2xl mb-6 border border-blue-800/50">
-            <div class="flex justify-between items-center mb-3">
-                <span class="bg-red-600 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">● LIVE NOW</span>
-                <span class="text-xs text-gray-300">IND vs AUS | 3rd ODI</span>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <i class="fa-solid fa-play text-white text-xs"></i>
             </div>
-            <h2 class="text-xl font-black mb-1">Race Control & Live Center</h2>
-            <p class="text-gray-300 text-xs mb-4">Multi-angle streams with real-time stats and telemetry sync.</p>
-            <button onclick="alert('Opening Live Stream Player...')" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2 px-5 rounded-xl transition shadow-lg shadow-red-600/30">
-                <i class="fa-solid fa-play mr-1"></i> Watch Live
+            <span class="font-black text-lg tracking-wider bg-gradient-to-r from-white via-gray-200 to-blue-400 bg-clip-text text-transparent">STREAMHUB</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button aria-label="Search" class="w-9 h-9 rounded-full bg-[#131b2e] border border-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-700 transition">
+                <i class="fa-solid fa-search text-xs"></i>
             </button>
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center font-bold text-xs shadow-md">
+                सं
+            </div>
         </div>
+    </header>
 
-        {/* Category Tabs */}
-        <div class="flex space-x-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
-            <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-xl whitespace-nowrap">All</button>
-            <button class="bg-[#131b2e] text-gray-400 hover:text-white text-xs font-semibold px-4 py-2 rounded-xl whitespace-nowrap border border-gray-800">🏏 Cricket</button>
-            <button class="bg-[#131b2e] text-gray-400 hover:text-white text-xs font-semibold px-4 py-2 rounded-xl whitespace-nowrap border border-gray-800">⚽ Football</button>
-            <button class="bg-[#131b2e] text-gray-400 hover:text-white text-xs font-semibold px-4 py-2 rounded-xl whitespace-nowrap border border-gray-800">📺 TV Channels</button>
-        </div>
+    <!-- Main Content Container -->
+    <main class="p-4 max-w-md mx-auto sm:max-w-xl md:max-w-2xl">
 
-        {/* Live Now Grid */}
-        <h3 class="text-sm font-bold mb-3 text-gray-200">Smart Cards & Live Feeds</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            
-            <!-- Card 1 -->
-            <div class="bg-[#131b2e] p-3.5 rounded-xl border border-gray-800 hover:border-blue-500 transition cursor-pointer">
-                <div class="flex justify-between text-[11px] text-gray-400 mb-2">
-                    <span class="text-blue-400 font-semibold">Cricket</span>
-                    <span class="text-red-500 font-bold">● 264/5 (45.1 ov)</span>
+        <!-- Featured Live Command Center Banner (F1 TV Inspired) -->
+        <section class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-blue-950 via-[#101932] to-slate-900 p-5 shadow-2xl mb-6 border border-blue-800/40">
+            <!-- Background Glow Effect -->
+            <div class="absolute -right-10 -top-10 w-36 h-36 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                    </span>
+                    <span class="bg-red-600/20 text-red-400 text-[10px] px-2.5 py-0.5 rounded-md font-extrabold tracking-wider uppercase border border-red-500/30">Live Stream</span>
                 </div>
-                <h4 class="font-bold text-sm mb-1">IND vs AUS</h4>
-                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mt-2">
-                    <div class="bg-blue-500 h-full w-[70%]"></div>
-                </div>
+                <span class="text-xs text-gray-400 font-medium">IND vs AUS • 3rd ODI</span>
             </div>
 
-            <!-- Card 2 -->
-            <div class="bg-[#131b2e] p-3.5 rounded-xl border border-gray-800 hover:border-blue-500 transition cursor-pointer">
-                <div class="flex justify-between text-[11px] text-gray-400 mb-2">
-                    <span class="text-blue-400 font-semibold">Football</span>
-                    <span class="text-red-500 font-bold">● LIVE</span>
-                </div>
-                <h4 class="font-bold text-sm mb-1">Premier League: Man Utd vs Liverpool</h4>
-                <p class="text-xs text-gray-400 mt-1">Stamford Bridge • HD Stream</p>
+            <h1 class="text-xl font-black mb-1 tracking-tight">Race & Match Control Center</h1>
+            <p class="text-gray-300 text-xs mb-4 leading-relaxed">Multi-angle camera feeds synced with real-time telemetry analytics and live win probabilities.</p>
+
+            <!-- Quick Control Actions -->
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <button onclick="alert('Opening Live Stream...')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-play text-[10px]"></i>
+                    <span>Watch</span>
+                </button>
+                <button onclick="alert('Opening Multi-View Feeds...')" class="bg-[#192238] hover:bg-[#222e4a] text-gray-200 font-semibold text-xs py-2 px-3 rounded-xl transition border border-gray-700/60 flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-columns text-[10px] text-blue-400"></i>
+                    <span>Multi-View</span>
+                </button>
+                <button onclick="alert('Opening Live Chat...')" class="bg-[#192238] hover:bg-[#222e4a] text-gray-200 font-semibold text-xs py-2 px-3 rounded-xl transition border border-gray-700/60 flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-comments text-[10px] text-cyan-400"></i>
+                    <span>Chat</span>
+                </button>
             </div>
 
-        </div>
+            <!-- Mini Live Score Progress -->
+            <div class="bg-[#0b101d]/60 p-2.5 rounded-xl border border-gray-800/80 flex items-center justify-between text-xs">
+                <div>
+                    <span class="text-gray-400">IND:</span> <strong class="text-white">264/5</strong> <span class="text-gray-500 text-[10px]">(45.1 ov)</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-emerald-400 font-semibold text-[11px]">● Win Prob: IND 78%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Horizontal Scroll Tabs -->
+        <nav aria-label="Category Selection" class="flex space-x-2 overflow-x-auto no-scrollbar pb-3 mb-4">
+            <button class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-xl whitespace-nowrap shadow-md shadow-blue-600/20">All Feeds</button>
+            <button class="bg-[#111827] text-gray-400 hover:text-white text-xs font-medium px-4 py-2 rounded-xl whitespace-nowrap border border-gray-800/80 transition">🏏 Cricket</button>
+            <button class="bg-[#111827] text-gray-400 hover:text-white text-xs font-medium px-4 py-2 rounded-xl whitespace-nowrap border border-gray-800/80 transition">⚽ Football</button>
+            <button class="bg-[#111827] text-gray-400 hover:text-white text-xs font-medium px-4 py-2 rounded-xl whitespace-nowrap border border-gray-800/80 transition">🏎️ Formula 1</button>
+            <button class="bg-[#111827] text-gray-400 hover:text-white text-xs font-medium px-4 py-2 rounded-xl whitespace-nowrap border border-gray-800/80 transition">📺 IPTV Channels</button>
+        </nav>
+
+        <!-- Live Matches / Smart Cards Grid -->
+        <section class="mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-sm font-bold text-gray-200 uppercase tracking-wider">Smart Cards & Live Now</h2>
+                <span class="text-xs text-blue-400 font-medium cursor-pointer hover:underline">View All</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                
+                <!-- Card 1: Cricket Live -->
+                <div onclick="alert('Loading IND vs AUS stream...')" class="bg-[#111827] p-3.5 rounded-xl border border-gray-800 hover:border-blue-500/60 transition cursor-pointer group shadow-md">
+                    <div class="flex justify-between text-[11px] text-gray-400 mb-2">
+                        <span class="text-blue-400 font-semibold flex items-center"><i class="fa-solid fa-trophy mr-1 text-[10px]"></i> Cricket</span>
+                        <span class="text-red-500 font-extrabold animate-pulse">● LIVE</span>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1 group-hover:text-blue-400 transition">IND vs AUS (3rd ODI)</h3>
+                    <p class="text-xs text-gray-400 mb-3">Multi-server 1080p60 • Hindi/English</p>
+                    <div class="w-full bg-gray-900 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full w-[75%]"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Football Live -->
+                <div onclick="alert('Loading Premier League stream...')" class="bg-[#111827] p-3.5 rounded-xl border border-gray-800 hover:border-blue-500/60 transition cursor-pointer group shadow-md">
+                    <div class="flex justify-between text-[11px] text-gray-400 mb-2">
+                        <span class="text-blue-400 font-semibold flex items-center"><i class="fa-solid fa-futbol mr-1 text-[10px]"></i> Football</span>
+                        <span class="text-red-500 font-extrabold animate-pulse">● LIVE</span>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1 group-hover:text-blue-400 transition">Premier League: Man Utd vs Live.</h3>
+                    <p class="text-xs text-gray-400 mb-3">Old Trafford • Stable Backup Link</p>
+                    <div class="w-full bg-gray-900 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full w-[45%]"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Replay & Archive Section -->
+        <section>
+            <h2 class="text-sm font-bold text-gray-200 uppercase tracking-wider mb-3">Replay & Season Archive</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-[#111827] p-3 rounded-xl border border-gray-800 text-center hover:border-gray-700 transition cursor-pointer">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center mx-auto mb-2">
+                        <i class="fa-solid fa-rotate-left text-xs"></i>
+                    </div>
+                    <h4 class="font-bold text-xs mb-0.5">Full Match Replays</h4>
+                    <p class="text-[10px] text-gray-400">Catch up on missed games</p>
+                </div>
+                <div class="bg-[#111827] p-3 rounded-xl border border-gray-800 text-center hover:border-gray-700 transition cursor-pointer">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center mx-auto mb-2">
+                        <i class="fa-solid fa-film text-xs"></i>
+                    </div>
+                    <h4 class="font-bold text-xs mb-0.5">Highlights Hub</h4>
+                    <p class="text-[10px] text-gray-400">Short clips & summaries</p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Bottom Navigation Bar (Mobile Style) -->
-    <div class="fixed bottom-0 left-0 right-0 bg-[#131b2e] border-t border-gray-800 flex justify-around py-2.5 text-gray-400 text-xs z-50">
-        <button class="flex flex-col items-center text-blue-500">
-            <i class="fa-solid fa-house text-base mb-0.5"></i>
+    <!-- Bottom Navigation Bar (App Dock Style) -->
+    <nav aria-label="Bottom Navigation" class="fixed bottom-0 left-0 right-0 bg-[#0d1322]/90 backdrop-blur-lg border-t border-gray-800/80 flex justify-around py-3 text-gray-400 text-[11px] z-50">
+        <button class="flex flex-col items-center text-blue-500 font-semibold">
+            <i class="fa-solid fa-house text-base mb-1"></i>
             <span>Home</span>
         </button>
-        <button class="flex flex-col items-center hover:text-white">
-            <i class="fa-solid fa-chart-line text-base mb-0.5"></i>
+        <button class="flex flex-col items-center hover:text-white transition">
+            <i class="fa-solid fa-chart-line text-base mb-1"></i>
             <span>Telemetry</span>
         </button>
-        <button class="flex flex-col items-center hover:text-white">
-            <i class="fa-solid fa-clock-rotate-left text-base mb-0.5"></i>
+        <button class="flex flex-col items-center hover:text-white transition">
+            <i class="fa-solid fa-clock-rotate-left text-base mb-1"></i>
             <span>Archive</span>
         </button>
-        <button class="flex flex-col items-center hover:text-white">
-            <i class="fa-solid fa-stopwatch text-base mb-0.5"></i>
+        <button class="flex flex-col items-center hover:text-white transition">
+            <i class="fa-solid fa-stopwatch text-base mb-1"></i>
             <span>Live Timing</span>
         </button>
-    </div>
+    </nav>
 
 </body>
-</html>
+                </html>
